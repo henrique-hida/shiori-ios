@@ -8,9 +8,7 @@
 import Foundation
 import FirebaseAuth
 
-final class FirebaseAuthService: AuthService {
-    let shared: any AuthService = FirebaseAuthService()
-    
+final class FirebaseAuthRepository: AuthRepository {
     func signUp(withEmail email: String, withPassword password: String) async throws -> AuthDataResult {
         let authDataResult = try await Auth.auth().createUser(withEmail: email, password: password)
         return AuthDataResult(user: authDataResult.user)

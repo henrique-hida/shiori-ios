@@ -11,14 +11,21 @@ import FirebaseCore
 
 @main
 struct ShioriApp: App {
+    
+    private let authRepository: AuthRepository
+    private let userService: UserService
+    
     init() {
         FirebaseApp.configure()
+        
+        self.authRepository = FirebaseAuthRepository()
+        self.userService = DefaultUserService(authRepository: authRepository)
     }
     
     var body: some Scene {
         WindowGroup {
-            HomeView()
+            HomeView(userService: userService)
         }
-        .modelContainer(for: [CurrentUser.self])
+        .modelContainer(for: [LocalUser.self])
     }
 }

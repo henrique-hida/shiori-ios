@@ -8,11 +8,9 @@
 import Foundation
 
 protocol UserService {
-    var currentUser: LocalUser? { get }
-    
-    func signUp(withEmail email: String, withPassword password: String, withName firstName: String) async throws
-    func signIn(withEmail email: String, withPassword password: String) async throws
+    func signUp(withEmail email: String, withPassword password: String, withName firstName: String) async throws -> AppUser
+    func signIn(withEmail email: String, withPassword password: String) async throws -> AppUser
     func signOut() throws
     
-    init(authRepository: AuthRepository)
+    init(authRepository: AuthRepository, users: [AppUser])
 }

@@ -26,6 +26,6 @@ struct ShioriApp: App {
         WindowGroup {
             HomeView(userService: userService)
         }
-        .modelContainer(for: [LocalUser.self])
+        .modelContainer(for: [AppUser.self])
     }
 }

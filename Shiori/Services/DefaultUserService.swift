@@ -24,7 +24,6 @@ final class DefaultUserService: UserService {
         let authId = try await authNewUser(request: request)
         let newUser = try await createUser(request: request, id: authId)
         return try await saveUser(user: newUser)
-        
     }
     
     private func authNewUser(request: SignUpRequest) async throws -> String {

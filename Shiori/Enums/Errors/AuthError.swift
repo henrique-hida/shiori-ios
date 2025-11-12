@@ -13,6 +13,7 @@ enum AuthError: Error, LocalizedError {
     case emailAlreadyInUse
     case weakPassword
     case networkError
+    case databaseSaveFailed
     case unknown
     
     var errorDescription: String? {
@@ -27,6 +28,8 @@ enum AuthError: Error, LocalizedError {
             return "The password must be at least 6 characters long."
         case .networkError:
             return "A network error occurred. Please check your connection."
+        case .databaseSaveFailed:
+            return "A internal error occured. Please try again later."
         case .unknown:
             return "An unknown error occurred. Please try again later."
         }

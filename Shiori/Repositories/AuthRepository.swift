@@ -8,7 +8,8 @@
 import Foundation
 
 protocol AuthRepository {
-    func signUp(withEmail email: String, withPassword password: String) async throws -> AuthDataResult
-    func signIn(withEmail email: String, withPassword password: String) async throws -> AuthDataResult
+    func signUp(email: String, password: String) async throws -> String
+    func signIn(email: String, password: String) async throws -> String
     func signOut() throws
+    func deleteCurrentUser() async throws
 }

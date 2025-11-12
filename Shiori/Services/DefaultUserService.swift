@@ -11,60 +11,75 @@ import SwiftData
 
 final class DefaultUserService: UserService {
     let authRepository: AuthRepository
-    let users: [AppUser]
+    let newsDatabaseRepository: NewsDatabaseRepository
+    let modelContext: ModelContext
     
-    init(authRepository: AuthRepository, users: [AppUser]) {
+    init(authRepository: AuthRepository, newsDatabaseRepository: NewsDatabaseRepository ,modelContext: ModelContext) {
         self.authRepository = authRepository
-        self.users = users
+        self.newsDatabaseRepository = newsDatabaseRepository
+        self.modelContext = modelContext
     }
     
-    func signUp(withEmail email: String, withPassword password: String, withName firstName: String) async throws -> AppUser {
-        let authResult = try await authRepository.signUp(withEmail: email, withPassword: password)
+    func signUp(request: SignUpRequest) async throws -> String {
+        let authId = try await authNewUser(request: request)
+        let newUser = try await createUser(request: request, id: authId)
+        return try await saveUser(user: newUser)
         
-        return AppUser(id: authResult.uid, firstName: firstName, isPremium: false, systemLanguage: getUserSystemLanguage(), isDarkSchemePrefered: getUserDarkSchemePrefered(), todayBackupNews: getTodayCustomNews(), newsPreferences: initializeNewsPreferences())
     }
     
-    private func initializeNewsPreferences() -> NewsPreferences {
-        return NewsPreferences(newsDuration: .standard, newsStyles: .informal, newsSubjects: [.entertainmentAndCulture, .world], newsLanguages: getUserSystemLanguage(), newsArriveTime: 9)
-    }
-    
-    private func getUserSystemLanguage() -> Language {
-        switch(Locale.preferredLanguages.first){
-        case "eng":
-            return .english
-        case "por":
-            return .spanish
-        case "spa":
-            return .spanish
-        default:
-            return .english
+    private func authNewUser(request: SignUpRequest) async throws -> String {
+        do {
+            return try await authRepository.signUp(email: request.email, password: request.password)
+        } catch let authError as AuthError{
+            throw UserServiceError.authFailed(authError)
+        } catch {
+            throw UserServiceError.unknown(error)
         }
     }
     
-    private func getUserDarkSchemePrefered() -> Bool {
-        @Environment(\.colorScheme) var colorScheme
-        switch(colorScheme){
-        case .dark:
-            return true
-        default:
-            return false
+    private func createUser(request: SignUpRequest, id: String) async throws -> AppUser {
+        do {
+            return try await convertRequestToUser(request: request, id: id)
+        } catch {
+            throw UserServiceError.unknown(error)
         }
     }
     
-    private func getTodayCustomNews() -> News {
-        return News(title: "Breaking News", content: "Some news have arrived", thumbLink: "https://s2-g1.glbimg.com/uJsrU86-jcyZTdZB4T_fDbE6X2g=/0x69:2362x1398/1080x608/smart/filters:max_age(3600)/https://i.s3.glbimg.com/v1/AUTH_59edd422c0c84a879bd37670ae4f538a/internal_photos/bs/2021/P/4/ptF4I2TCOrbiXeVlpPqw/assets-fotos-790-dandara-mariana-paolla-oliveira-e-rodrigo-simas-falam-sobre-a-final-da-super-danca-1-7acd0cc6ae87.jpg", date: Date(), articleLinks: ["https://g1.globo.com/educacao/enem/2025/noticia/2025/11/09/tema-da-redacao-enem-2025-veja-analise-comentarios-dos-professores.ghtml"], wasRead: false)
+    private func convertRequestToUser(request: SignUpRequest, id: String) async throws -> AppUser {
+        let newsPreferences = NewsPreferences(newsDuration: request.newsDuration, newsStyle: request.newsStyle, newsSubjects: request.newsSubjects, newsLanguage: request.language, newsArriveTime: request.newsArriveTime)
+        let todayBackupNews = try await newsDatabaseRepository.getTodayNews(newsPreferences: newsPreferences)
+        return AppUser(id: id, firstName: request.firstName, isPremium: request.isPremium, language: request.language, schema: request.schema, todayBackupNews: todayBackupNews, newsPreferences: newsPreferences)
     }
     
-    func signIn(withEmail email: String, withPassword password: String) async throws -> AppUser {
-        let authResult = try await authRepository.signIn(withEmail: email, withPassword: password)
-        for user in users {
-            if user.id == authResult.uid {
-                return user
-            }
+    private func saveUser(user: AppUser) async throws -> String {
+        do {
+            modelContext.insert(user)
+            try modelContext.save()
+            return user.id
+        } catch {
+            print("SwiftData save failed. Rolling back Firebase user...")
+            try? await authRepository.deleteCurrentUser()
+            throw UserServiceError.userDatabaseSaveFailed(error)
+        }
+    }
+    
+    func signIn(email: String, password: String) async throws -> String {
+        do {
+            return try await authRepository.signIn(email: email, password: password)
+        } catch let authError as AuthError {
+            throw UserServiceError.authFailed(authError)
+        } catch {
+            throw UserServiceError.unknown(error)
         }
     }
     
     func signOut() throws {
-        try authRepository.signOut()
+        do {
+            try authRepository.signOut()
+        } catch let authError as AuthError {
+            throw UserServiceError.authFailed(authError)
+        } catch {
+            throw UserServiceError.unknown(error)
+        }
     }
 }

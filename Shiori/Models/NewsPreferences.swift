@@ -11,16 +11,16 @@ import SwiftData
 @Model
 class NewsPreferences {
     var newsDuration: NewsDuration
-    var newsStyles: NewsStyle
+    var newsStyle: NewsStyle
     var newsSubjects: [NewsSubject]
-    var newsLanguages: Language
+    var newsLanguage: Language
     var newsArriveTime: Int
     
-    init(newsDuration: NewsDuration, newsStyles: NewsStyle, newsSubjects: [NewsSubject], newsLanguages: Language, newsArriveTime: Int) {
+    init(newsDuration: NewsDuration, newsStyle: NewsStyle, newsSubjects: [NewsSubject], newsLanguage: Language, newsArriveTime: Int) {
         self.newsDuration = newsDuration
-        self.newsStyles = newsStyles
+        self.newsStyle = newsStyle
         self.newsSubjects = newsSubjects
-        self.newsLanguages = newsLanguages
+        self.newsLanguage = newsLanguage
         self.newsArriveTime = newsArriveTime
     }
 }

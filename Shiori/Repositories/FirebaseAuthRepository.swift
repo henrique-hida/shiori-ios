@@ -8,20 +8,31 @@
 import Foundation
 import FirebaseAuth
 
+struct AuthDataResult {
+    let uid: String
+    let email: String?
+    
+    init(user: User) {
+        self.uid = user.uid
+        self.email = user.email
+    }
+}
+
 final class FirebaseAuthRepository: AuthRepository {
-    func signUp(withEmail email: String, withPassword password: String) async throws -> AuthDataResult {
+    func signUp(email: String, password: String) async throws -> String {
+        let authId: String
         do {
             let authDataResult = try await Auth.auth().createUser(withEmail: email, password: password)
-            return AuthDataResult(user: authDataResult.user)
+            return AuthDataResult(user: authDataResult.user).uid
         } catch {
             throw mapError(error)
         }
     }
     
-    func signIn(withEmail email: String, withPassword password: String) async throws -> AuthDataResult {
+    func signIn(email: String, password: String) async throws -> String {
         do {
             let authDataResult = try await Auth.auth().signIn(withEmail: email, password: password)
-            return AuthDataResult(user: authDataResult.user)
+            return AuthDataResult(user: authDataResult.user).uid
         } catch {
             throw mapError(error)
         }
@@ -30,6 +41,17 @@ final class FirebaseAuthRepository: AuthRepository {
     func signOut() throws{
         do {
             try Auth.auth().signOut()
+        } catch {
+            throw mapError(error)
+        }
+    }
+    
+    func deleteCurrentUser() async throws {
+        guard let user = Auth.auth().currentUser else {
+            return
+        }
+        do {
+            try await user.delete()
         } catch {
             throw mapError(error)
         }

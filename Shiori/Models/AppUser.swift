@@ -13,17 +13,17 @@ class AppUser {
     @Attribute(.unique) private(set) var id: String
     private(set) var firstName: String
     var isPremium: Bool
-    var systemLanguage: Language
-    var isDarkSchemePrefered: Bool
+    var language: Language
+    var schema: Schema
     var todayBackupNews: News
     var newsPreferences: NewsPreferences
     
-    init(id: String, firstName: String, isPremium: Bool, systemLanguage: Language, isDarkSchemePrefered: Bool, todayBackupNews: News, newsPreferences: NewsPreferences) {
+    init(id: String, firstName: String, isPremium: Bool, language: Language, schema: Schema, todayBackupNews: News, newsPreferences: NewsPreferences) {
         self.id = id
         self.firstName = firstName
         self.isPremium = isPremium
-        self.systemLanguage = systemLanguage
-        self.isDarkSchemePrefered = isDarkSchemePrefered
+        self.language = language
+        self.schema = schema
         self.todayBackupNews = todayBackupNews
         self.newsPreferences = newsPreferences
     }

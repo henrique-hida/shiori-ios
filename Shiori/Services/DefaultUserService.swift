@@ -46,8 +46,16 @@ final class DefaultUserService: UserService {
     
     private func convertRequestToUser(request: SignUpRequest, id: String) async throws -> AppUser {
         let newsPreferences = NewsPreferences(newsDuration: request.newsDuration, newsStyle: request.newsStyle, newsSubjects: request.newsSubjects, newsLanguage: request.language, newsArriveTime: request.newsArriveTime)
-        let todayBackupNews = try await newsDatabaseRepository.getTodayNews(newsPreferences: newsPreferences)
-        return AppUser(id: id, firstName: request.firstName, isPremium: request.isPremium, language: request.language, schema: request.schema, todayBackupNews: todayBackupNews, newsPreferences: newsPreferences)
+        let todayBackupNews = try await newsDatabaseRepository.getTodayNews(newsPreferences: convertNewsPreferencesToRequest(newsPreferences: newsPreferences))
+        return AppUser(id: id, firstName: request.firstName, isPremium: request.isPremium, language: request.language, schema: request.schema, todayBackupNews: convertRequestToNews(request: todayBackupNews), newsPreferences: newsPreferences)
+    }
+    
+    private func convertNewsPreferencesToRequest(newsPreferences: NewsPreferences) -> NewsRequest {
+        return NewsRequest(newsDuration: newsPreferences.newsDuration, newsStyle: newsPreferences.newsStyle, newsSubjects: newsPreferences.newsSubjects, newsLanguage: newsPreferences.newsLanguage, newsArriveTime: newsPreferences.newsArriveTime)
+    }
+    
+    private func convertRequestToNews(request: NewsRequest) -> News {
+        return News(title: request.title!, content: request.content!, thumbLink: request.thumbLink!, date: request.date!, articleLinks: request.articleLinks!, wasRead: request.wasRead!)
     }
     
     private func saveUser(user: AppUser) async throws -> String {

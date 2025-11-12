@@ -20,7 +20,6 @@ struct AuthDataResult {
 
 final class FirebaseAuthRepository: AuthRepository {
     func signUp(email: String, password: String) async throws -> String {
-        let authId: String
         do {
             let authDataResult = try await Auth.auth().createUser(withEmail: email, password: password)
             return AuthDataResult(user: authDataResult.user).uid

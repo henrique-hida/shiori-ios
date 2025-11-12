@@ -14,11 +14,11 @@ class AppUser {
     private(set) var firstName: String
     var isPremium: Bool
     var language: Language
-    var schema: Schema
+    var schema: Theme
     var todayBackupNews: News
     var newsPreferences: NewsPreferences
     
-    init(id: String, firstName: String, isPremium: Bool, language: Language, schema: Schema, todayBackupNews: News, newsPreferences: NewsPreferences) {
+    init(id: String, firstName: String, isPremium: Bool, language: Language, schema: Theme, todayBackupNews: News, newsPreferences: NewsPreferences) {
         self.id = id
         self.firstName = firstName
         self.isPremium = isPremium

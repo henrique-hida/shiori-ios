@@ -6,30 +6,24 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct HomeView: View {
     let userService: UserService
-    @State private var viewModel: HomeViewModel
     
     init(userService: UserService) {
         self.userService = userService
-        self.viewModel = HomeViewModel(userService: userService)
     }
         
     var body: some View {
-        NavigationStack {
-            switch viewModel.state {
-            case .userLoggedIn:
-                Text("Home View")
-            case .userLoggedOut:
-                SignInView()
-            }
-        }
+        
     }
 }
 
 #Preview {
-    let userService: UserService
-    let authRepository: AuthRepository
-    HomeView(userService: DefaultUserService(authRepository: FirebaseAuthRepository()))
+    let container: ModelContainer = {
+        let schema = Schema([AppUser.self, NewsPreferences.self, NewsPreferences.self, Summary.self])
+            return try! ModelContainer(for: schema)
+        }()
+    HomeView(userService: DefaultUserService(authRepository: FirebaseAuthRepository(), newsDatabaseRepository: MockNewsDatabaseRepository(), modelContext: container.mainContext))
 }

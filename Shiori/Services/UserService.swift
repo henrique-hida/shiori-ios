@@ -14,7 +14,7 @@ struct SignUpRequest: Sendable {
     let firstName: String
     let isPremium: Bool
     let language: Language
-    let schema: Schema
+    let schema: Theme
     
     let newsDuration: NewsDuration
     let newsStyle: NewsStyle

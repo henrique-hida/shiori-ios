@@ -6,13 +6,24 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct SignInView: View {
+    let userService: UserService
+    
+    init(userService: UserService) {
+        self.userService = userService
+    }
+    
     var body: some View {
-        Text("SignIn!")
+        
     }
 }
 
 #Preview {
-    SignInView()
+    let container: ModelContainer = {
+        let schema = Schema([AppUser.self, NewsPreferences.self, NewsPreferences.self, Summary.self])
+            return try! ModelContainer(for: schema)
+        }()
+    SignInView(userService: DefaultUserService(authRepository: FirebaseAuthRepository(), newsDatabaseRepository: MockNewsDatabaseRepository(), modelContext: container.mainContext))
 }

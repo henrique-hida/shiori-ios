@@ -28,10 +28,9 @@ final class FirebaseAuthRepository: AuthRepository {
         }
     }
     
-    func signIn(email: String, password: String) async throws -> String {
+    func signIn(email: String, password: String) async throws {
         do {
-            let authDataResult = try await Auth.auth().signIn(withEmail: email, password: password)
-            return AuthDataResult(user: authDataResult.user).uid
+            try await Auth.auth().signIn(withEmail: email, password: password)
         } catch {
             throw mapError(error)
         }

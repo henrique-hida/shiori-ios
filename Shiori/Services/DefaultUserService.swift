@@ -20,10 +20,10 @@ final class DefaultUserService: UserService {
         self.modelContext = modelContext
     }
     
-    func signUp(request: SignUpRequest) async throws -> String {
+    func signUp(request: SignUpRequest) async throws {
         let authId = try await authNewUser(request: request)
         let newUser = try await createUser(request: request, id: authId)
-        return try await saveUser(user: newUser)
+        try await saveUser(user: newUser)
     }
     
     private func authNewUser(request: SignUpRequest) async throws -> String {
@@ -58,11 +58,10 @@ final class DefaultUserService: UserService {
         return News(title: request.title!, content: request.content!, thumbLink: request.thumbLink!, date: request.date!, articleLinks: request.articleLinks!, wasRead: request.wasRead!)
     }
     
-    private func saveUser(user: AppUser) async throws -> String {
+    private func saveUser(user: AppUser) async throws {
         do {
             modelContext.insert(user)
             try modelContext.save()
-            return user.id
         } catch {
             print("SwiftData save failed. Rolling back Firebase user...")
             try? await authRepository.deleteCurrentUser()
@@ -70,9 +69,9 @@ final class DefaultUserService: UserService {
         }
     }
     
-    func signIn(email: String, password: String) async throws -> String {
+    func signIn(email: String, password: String) async throws {
         do {
-            return try await authRepository.signIn(email: email, password: password)
+            try await authRepository.signIn(email: email, password: password)
         } catch let authError as AuthError {
             throw UserServiceError.authFailed(authError)
         } catch {

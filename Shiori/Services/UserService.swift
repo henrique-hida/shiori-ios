@@ -23,9 +23,13 @@ struct SignUpRequest: Sendable {
 }
 
 protocol UserService {
-    func signUp(request: SignUpRequest) async throws -> String
-    func signIn(email: String, password: String) async throws -> String
-    func signOut() throws
+    var authRepository: AuthRepository { get }
+    var newsDatabaseRepository: NewsDatabaseRepository { get }
+    var modelContext: ModelContext { get }
     
     init(authRepository: AuthRepository, newsDatabaseRepository: NewsDatabaseRepository, modelContext: ModelContext)
+    
+    func signUp(request: SignUpRequest) async throws
+    func signIn(email: String, password: String) async throws
+    func signOut() throws
 }

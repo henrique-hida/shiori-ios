@@ -39,6 +39,22 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		B42EE8AE2ECBB0AD00780128 /* Exceptions for "Shared" folder in "ShioriTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Assets.xcassets,
+				Roboto.ttf,
+			);
+			target = B44B010B2EBE7BDE00CE96EE /* ShioriTests */;
+		};
+		B42EE8AF2ECBB0AD00780128 /* Exceptions for "Shared" folder in "ShioriUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Assets.xcassets,
+				Roboto.ttf,
+			);
+			target = B44B01152EBE7BDE00CE96EE /* ShioriUITests */;
+		};
 		B4DFE8A42EC2665F00CC0516 /* Exceptions for "Shiori" folder in "Shiori" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -49,6 +65,15 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		B42EE8AD2ECBB0A400780128 /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				B42EE8AE2ECBB0AD00780128 /* Exceptions for "Shared" folder in "ShioriTests" target */,
+				B42EE8AF2ECBB0AD00780128 /* Exceptions for "Shared" folder in "ShioriUITests" target */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
 		B44B00FF2EBE7BDD00CE96EE /* Shiori */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -99,6 +124,7 @@
 		B44B00F42EBE7BDD00CE96EE = {
 			isa = PBXGroup;
 			children = (
+				B42EE8AD2ECBB0A400780128 /* Shared */,
 				B44B00FF2EBE7BDD00CE96EE /* Shiori */,
 				B44B010F2EBE7BDE00CE96EE /* ShioriTests */,
 				B44B01192EBE7BDE00CE96EE /* ShioriUITests */,
@@ -141,6 +167,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				B42EE8AD2ECBB0A400780128 /* Shared */,
 				B44B00FF2EBE7BDD00CE96EE /* Shiori */,
 			);
 			name = Shiori;
@@ -166,6 +193,7 @@
 				B44B010E2EBE7BDE00CE96EE /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
+				B42EE8AD2ECBB0A400780128 /* Shared */,
 				B44B010F2EBE7BDE00CE96EE /* ShioriTests */,
 			);
 			name = ShioriTests;
@@ -189,6 +217,7 @@
 				B44B01182EBE7BDE00CE96EE /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
+				B42EE8AD2ECBB0A400780128 /* Shared */,
 				B44B01192EBE7BDE00CE96EE /* ShioriUITests */,
 			);
 			name = ShioriUITests;

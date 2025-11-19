@@ -30,7 +30,7 @@ struct RootView: View {
             case .checking:
                 ProgressView()
             case .signedOut:
-                SignInView(userService: userService)
+                StartingView(userService: userService)
             case .signedIn:
                 HomeView(userService: userService)
             }

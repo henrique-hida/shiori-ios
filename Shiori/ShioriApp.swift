@@ -32,7 +32,10 @@ struct ShioriApp: App {
     
     var body: some Scene {
         WindowGroup {
-            HomeView(userService: userService)
+            NavigationStack {
+//              HomeView(userService: userService)
+                StartingView(userService: userService)
+            }
         }
         .modelContainer(container)
     }

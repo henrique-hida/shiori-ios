@@ -1,0 +1,72 @@
+//
+//  ShioriField.swift
+//  Shiori
+//
+//  Created by Henrique Hida on 19/11/25.
+//
+
+import SwiftUI
+
+struct ShioriField: View {
+    enum FieldStyleType {
+        case text
+        case secure
+    }
+    
+    let icon: String
+    let placeholder: String
+    @Binding var text: String
+    let style: FieldStyleType
+    let keyboard: UIKeyboardType
+    
+    @State private var showSecureField: Bool = false
+    
+    init(icon: String, placeholder: String, text: Binding<String>, style: FieldStyleType, keyboard: UIKeyboardType = .default) {
+        self.icon = icon
+        self.placeholder = placeholder
+        self._text = text
+        self.style = style
+        self.keyboard = keyboard
+    }
+    
+    var body: some View {
+        HStack {
+            Image(systemName: icon)
+                .frame(width: 25)
+                .foregroundStyle(Color("TextUnsetColor"))
+            Group {
+                if style == .text {
+                    TextField(placeholder, text: $text, prompt: Text(placeholder).foregroundStyle(Color("TextUnsetColor")))
+                        .keyboardType(keyboard)
+                } else {
+                    if !showSecureField {
+                        SecureField(placeholder, text: $text, prompt: Text(placeholder).foregroundStyle(Color("TextUnsetColor")))
+                    } else {
+                        TextField(placeholder, text: $text, prompt: Text(placeholder).foregroundStyle(Color("TextUnsetColor")))
+                    }
+                    Image(systemName: showSecureField ? "eye" : "eye.slash")
+                        .foregroundStyle(Color("TextUnsetColor"))
+                        .onTapGesture {
+                            self.showSecureField.toggle()
+                        }
+                }
+            }
+            .tint(Color("AccentColor"))
+        }
+        .frame(height: 20)
+        .padding()
+        .background(Color("BgLightColor"))
+        .clipShape(RoundedRectangle(cornerRadius: 15))
+        .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
+    }
+}
+
+#Preview {
+    @Previewable @State var email: String = ""
+    @Previewable @State var password: String = ""
+    
+    ShioriField(icon: "envelope", placeholder: "Type your email", text: $email, style: .text, keyboard: .emailAddress)
+    ShioriField(icon: "lock", placeholder: "Type your password", text: $password, style: .secure)
+    
+    Text(email)
+}

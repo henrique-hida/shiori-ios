@@ -36,10 +36,9 @@ struct SignInView: View {
                     VStack {
                         VStack {
                             Text("Welcome")
-                                .font(Font.custom("Roboto-Bold", size: 48))
-                                .foregroundStyle(Color(Color.accentPrimaryShiori))
+                                .title()
                             Text("Login into you account")
-                                .font(Font.custom("Roboto-Regular", size: 20))
+                                .subTitle()
                         }
                         
                         Spacer()
@@ -52,9 +51,7 @@ struct SignInView: View {
                             HStack {
                                 Spacer()
                                 Text("Forgot your password?")
-                                    .font(.callout)
-                                    .underline(color: Color(Color.accentPrimaryShiori))
-                                    .foregroundStyle(Color(Color.accentPrimaryShiori))
+                                    .link()
                             }
                         }
                         
@@ -73,11 +70,9 @@ struct SignInView: View {
                             
                             HStack(spacing: 3) {
                                 Text("Don't have an account?")
-                                    .font(Font.custom("Roboto", size: 16))
+                                    .textSmall()
                                 Text("Sign in")
-                                    .font(Font.custom("Roboto", size: 16))
-                                    .underline(color: Color(Color.accentPrimaryShiori))
-                                    .foregroundStyle(Color(Color.accentPrimaryShiori))
+                                    .link()
                                     .onTapGesture {
                                         viewModel.goToSignUp()
                                     }

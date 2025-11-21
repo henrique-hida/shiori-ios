@@ -39,15 +39,13 @@ struct StartingView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             VStack(alignment: .leading, spacing: -10) {
                                 Text("Your new")
-                                    .font(Font.custom("Roboto-Bold", size: 48))
-                                    .foregroundStyle(Color(Color.accentPrimaryShiori))
+                                    .title()
                                 
                                 Text("Newsletter")
-                                    .font(Font.custom("Roboto-Bold", size: 48))
-                                    .foregroundStyle(Color(Color.accentPrimaryShiori))
+                                    .title()
                             }
                             Text("Login or register account")
-                                .font(Font.custom("Roboto-Regular", size: 18))
+                                .subTitle()
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         

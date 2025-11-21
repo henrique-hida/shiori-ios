@@ -8,9 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		B458AC162EC0E04F0092F26C /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = B458AC152EC0E04F0092F26C /* FirebaseAuth */; };
-		B458AC182EC0E0FF0092F26C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B458AC172EC0E0FF0092F26C /* GoogleService-Info.plist */; };
-		B458AC192EC0E0FF0092F26C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B458AC172EC0E0FF0092F26C /* GoogleService-Info.plist */; };
-		B458AC1A2EC0E0FF0092F26C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B458AC172EC0E0FF0092F26C /* GoogleService-Info.plist */; };
 		B458AC1C2EC0E16A0092F26C /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = B458AC1B2EC0E16A0092F26C /* FirebaseAnalytics */; };
 /* End PBXBuildFile section */
 
@@ -35,49 +32,39 @@
 		B44B00FD2EBE7BDD00CE96EE /* Shiori.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Shiori.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B44B010C2EBE7BDE00CE96EE /* ShioriTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShioriTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B44B01162EBE7BDE00CE96EE /* ShioriUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShioriUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		B458AC172EC0E0FF0092F26C /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		B42EE8AE2ECBB0AD00780128 /* Exceptions for "Shared" folder in "ShioriTests" target */ = {
+		B46E4A712ED02101002BADD9 /* Exceptions for "Shiori" folder in "ShioriTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Assets.xcassets,
-				Roboto.ttf,
+				"App/GoogleService-Info.plist",
 			);
 			target = B44B010B2EBE7BDE00CE96EE /* ShioriTests */;
 		};
-		B42EE8AF2ECBB0AD00780128 /* Exceptions for "Shared" folder in "ShioriUITests" target */ = {
+		B46E4A722ED02101002BADD9 /* Exceptions for "Shiori" folder in "ShioriUITests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Assets.xcassets,
-				Roboto.ttf,
+				"App/GoogleService-Info.plist",
 			);
 			target = B44B01152EBE7BDE00CE96EE /* ShioriUITests */;
 		};
 		B4DFE8A42EC2665F00CC0516 /* Exceptions for "Shiori" folder in "Shiori" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Info.plist,
+				App/Info.plist,
 			);
 			target = B44B00FC2EBE7BDD00CE96EE /* Shiori */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		B42EE8AD2ECBB0A400780128 /* Shared */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				B42EE8AE2ECBB0AD00780128 /* Exceptions for "Shared" folder in "ShioriTests" target */,
-				B42EE8AF2ECBB0AD00780128 /* Exceptions for "Shared" folder in "ShioriUITests" target */,
-			);
-			path = Shared;
-			sourceTree = "<group>";
-		};
 		B44B00FF2EBE7BDD00CE96EE /* Shiori */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				B4DFE8A42EC2665F00CC0516 /* Exceptions for "Shiori" folder in "Shiori" target */,
+				B46E4A712ED02101002BADD9 /* Exceptions for "Shiori" folder in "ShioriTests" target */,
+				B46E4A722ED02101002BADD9 /* Exceptions for "Shiori" folder in "ShioriUITests" target */,
 			);
 			path = Shiori;
 			sourceTree = "<group>";
@@ -124,13 +111,11 @@
 		B44B00F42EBE7BDD00CE96EE = {
 			isa = PBXGroup;
 			children = (
-				B42EE8AD2ECBB0A400780128 /* Shared */,
 				B44B00FF2EBE7BDD00CE96EE /* Shiori */,
 				B44B010F2EBE7BDE00CE96EE /* ShioriTests */,
 				B44B01192EBE7BDE00CE96EE /* ShioriUITests */,
 				B458AC142EC0E04F0092F26C /* Frameworks */,
 				B44B00FE2EBE7BDD00CE96EE /* Products */,
-				B458AC172EC0E0FF0092F26C /* GoogleService-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -167,7 +152,6 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				B42EE8AD2ECBB0A400780128 /* Shared */,
 				B44B00FF2EBE7BDD00CE96EE /* Shiori */,
 			);
 			name = Shiori;
@@ -193,7 +177,6 @@
 				B44B010E2EBE7BDE00CE96EE /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				B42EE8AD2ECBB0A400780128 /* Shared */,
 				B44B010F2EBE7BDE00CE96EE /* ShioriTests */,
 			);
 			name = ShioriTests;
@@ -217,7 +200,6 @@
 				B44B01182EBE7BDE00CE96EE /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				B42EE8AD2ECBB0A400780128 /* Shared */,
 				B44B01192EBE7BDE00CE96EE /* ShioriUITests */,
 			);
 			name = ShioriUITests;
@@ -279,7 +261,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B458AC182EC0E0FF0092F26C /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -287,7 +268,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B458AC1A2EC0E0FF0092F26C /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -295,7 +275,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B458AC192EC0E0FF0092F26C /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -468,7 +447,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Shiori/Info.plist;
+				INFOPLIST_FILE = Shiori/App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Shiori;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.news";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
@@ -515,7 +494,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Shiori/Info.plist;
+				INFOPLIST_FILE = Shiori/App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Shiori;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.news";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;

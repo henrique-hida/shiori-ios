@@ -48,6 +48,16 @@ extension View {
             .foregroundStyle(Color.textPrimaryShiori)
     }
     
+    func textLabelMuted() -> some View {
+        self.appFont(16, weight: .regular)
+            .foregroundStyle(Color.textMutedShiori)
+    }
+    
+    func textLabelSelected() -> some View {
+        self.appFont(16, weight: .regular)
+            .foregroundStyle(Color.textPrimaryShiori)
+    }
+    
     func textLarge() -> some View {
         self.appFont(16, weight: .bold)
             .foregroundStyle(Color.textPrimaryShiori)

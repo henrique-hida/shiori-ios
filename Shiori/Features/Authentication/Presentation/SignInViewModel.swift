@@ -13,7 +13,6 @@ class SignInViewModel {
     var email: String = ""
     var password: String = ""
     var isPasswordVisible: Bool = false
-    var goToHomeView: Bool = false
     var goToSignUpView: Bool = false
     
     private let signIn: SignInUseCase

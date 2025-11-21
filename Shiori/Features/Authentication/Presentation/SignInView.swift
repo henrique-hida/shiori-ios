@@ -44,7 +44,7 @@ struct SignInView: View {
                         Spacer()
                         
                         VStack(spacing: 15) {
-                            ShioriField(icon: "envelope", placeholder: "Email", text: $viewModel.email, style: .text, keyboard: .emailAddress)
+                            ShioriField(icon: "envelope", placeholder: "Email", text: $viewModel.email, keyboard: .emailAddress)
                             
                             ShioriField(icon: "lock", placeholder: "Password", text: $viewModel.password, style: .secure)
                             
@@ -68,10 +68,10 @@ struct SignInView: View {
                                 }
                             }
                             
-                            HStack(spacing: 3) {
-                                Text("Don't have an account?")
+                            HStack(spacing: 0) {
+                                Text("Don't have an account? ")
                                     .textSmall()
-                                Text("Sign in")
+                                Text("Sign up")
                                     .link()
                                     .onTapGesture {
                                         viewModel.goToSignUp()
@@ -83,6 +83,9 @@ struct SignInView: View {
                     .padding(.bottom, 25)
                 }
             }
+        }
+        .navigationDestination(isPresented: $viewModel.goToSignUpView) {
+            SignUpView()
         }
     }
 }

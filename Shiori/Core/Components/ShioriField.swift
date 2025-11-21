@@ -21,7 +21,7 @@ struct ShioriField: View {
     
     @State private var showSecureField: Bool = false
     
-    init(icon: String, placeholder: String, text: Binding<String>, style: FieldStyleType, keyboard: UIKeyboardType = .default) {
+    init(icon: String, placeholder: String, text: Binding<String>, style: FieldStyleType = .text, keyboard: UIKeyboardType = .default) {
         self.icon = icon
         self.placeholder = placeholder
         self._text = text
@@ -33,19 +33,20 @@ struct ShioriField: View {
         HStack {
             Image(systemName: icon)
                 .frame(width: 25)
-                .foregroundStyle(Color(Color.textUnset))
+                .textLabelMuted()
             Group {
                 if style == .text {
-                    TextField(placeholder, text: $text, prompt: Text(placeholder).foregroundStyle(Color(Color.textUnset)))
+                    TextField(placeholder, text: $text, prompt: Text(placeholder)
+                        .foregroundStyle(Color(Color.textMutedShiori)))
                         .keyboardType(keyboard)
                 } else {
                     if !showSecureField {
-                        SecureField(placeholder, text: $text, prompt: Text(placeholder).foregroundStyle(Color(Color.textUnset)))
+                        SecureField(placeholder, text: $text, prompt: Text(placeholder).foregroundStyle(Color(Color.textMutedShiori)))
                     } else {
-                        TextField(placeholder, text: $text, prompt: Text(placeholder).foregroundStyle(Color(Color.textUnset)))
+                        TextField(placeholder, text: $text, prompt: Text(placeholder).foregroundStyle(Color(Color.textMutedShiori)))
                     }
                     Image(systemName: showSecureField ? "eye" : "eye.slash")
-                        .foregroundStyle(Color(Color.textUnset))
+                        .textLabelMuted()
                         .onTapGesture {
                             self.showSecureField.toggle()
                         }

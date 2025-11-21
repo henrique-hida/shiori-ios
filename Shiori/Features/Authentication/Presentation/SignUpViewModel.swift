@@ -26,6 +26,10 @@ final class SignUpViewModel {
     var errorMessage: String?
     var isLoading = false
     
+    var goToSignInView = false
+    var signUpStep = 1
+    var buttonText = "Next"
+    
     private let signUp: SignUpUseCase
     
     init(signUp: SignUpUseCase) {
@@ -80,5 +84,35 @@ final class SignUpViewModel {
             throw ValidationError.emptyField("Email")
         }
         return email
+    }
+    
+    func goToSignIn() {
+        goToSignInView = true
+    }
+    
+    func goToNextStep() {
+        guard signUpStep == 1 else { return }
+        signUpStep += 1
+        buttonText = "Register"
+    }
+    
+    func goToPreviousStep() {
+        guard signUpStep == 2 else { return }
+        signUpStep -= 1
+        buttonText = "Next"
+    }
+    
+    func signUp() async throws{
+        try await signUp.execute(request: SignUpRequest(
+            email: email,
+            password: password,
+            firstName: firstName,
+            isPremium: isPremium,
+            language: selectedLanguage,
+            schema: selectedTheme,
+            newsDuration: selectedDuration,
+            newsStyle: selectedStyle,
+            newsSubjects: Array(selectedSubjects),
+            newsArriveTime: arriveTime))
     }
 }

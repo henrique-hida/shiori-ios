@@ -21,7 +21,7 @@ struct SignInView: View {
         GeometryReader { geo in
             ZStack {
                 // background
-                Color("BgColor")
+                Color(Color.backgroundShiori)
                     .ignoresSafeArea()
                 
                 // foreground
@@ -37,7 +37,7 @@ struct SignInView: View {
                         VStack {
                             Text("Welcome")
                                 .font(Font.custom("Roboto-Bold", size: 48))
-                                .foregroundStyle(Color("AccentColor"))
+                                .foregroundStyle(Color(Color.accentPrimaryShiori))
                             Text("Login into you account")
                                 .font(Font.custom("Roboto-Regular", size: 20))
                         }
@@ -53,8 +53,8 @@ struct SignInView: View {
                                 Spacer()
                                 Text("Forgot your password?")
                                     .font(.callout)
-                                    .underline(color: Color("AccentColor"))
-                                    .foregroundStyle(Color("AccentColor"))
+                                    .underline(color: Color(Color.accentPrimaryShiori))
+                                    .foregroundStyle(Color(Color.accentPrimaryShiori))
                             }
                         }
                         
@@ -76,8 +76,8 @@ struct SignInView: View {
                                     .font(Font.custom("Roboto", size: 16))
                                 Text("Sign in")
                                     .font(Font.custom("Roboto", size: 16))
-                                    .underline(color: Color("AccentColor"))
-                                    .foregroundStyle(Color("AccentColor"))
+                                    .underline(color: Color(Color.accentPrimaryShiori))
+                                    .foregroundStyle(Color(Color.accentPrimaryShiori))
                                     .onTapGesture {
                                         viewModel.goToSignUp()
                                     }

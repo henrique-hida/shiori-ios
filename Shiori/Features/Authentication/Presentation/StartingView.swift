@@ -17,7 +17,7 @@ struct StartingView: View {
         GeometryReader { geo in
             ZStack {
                 // background
-                Color("BgColor")
+                Color(Color.backgroundShiori)
                     .ignoresSafeArea()
                 
                 //foreground
@@ -40,11 +40,11 @@ struct StartingView: View {
                             VStack(alignment: .leading, spacing: -10) {
                                 Text("Your new")
                                     .font(Font.custom("Roboto-Bold", size: 48))
-                                    .foregroundStyle(Color("AccentColor"))
+                                    .foregroundStyle(Color(Color.accentPrimaryShiori))
                                 
                                 Text("Newsletter")
                                     .font(Font.custom("Roboto-Bold", size: 48))
-                                    .foregroundStyle(Color("AccentColor"))
+                                    .foregroundStyle(Color(Color.accentPrimaryShiori))
                             }
                             Text("Login or register account")
                                 .font(Font.custom("Roboto-Regular", size: 18))

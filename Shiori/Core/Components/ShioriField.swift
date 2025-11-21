@@ -33,29 +33,29 @@ struct ShioriField: View {
         HStack {
             Image(systemName: icon)
                 .frame(width: 25)
-                .foregroundStyle(Color("TextUnsetColor"))
+                .foregroundStyle(Color(Color.textUnset))
             Group {
                 if style == .text {
-                    TextField(placeholder, text: $text, prompt: Text(placeholder).foregroundStyle(Color("TextUnsetColor")))
+                    TextField(placeholder, text: $text, prompt: Text(placeholder).foregroundStyle(Color(Color.textUnset)))
                         .keyboardType(keyboard)
                 } else {
                     if !showSecureField {
-                        SecureField(placeholder, text: $text, prompt: Text(placeholder).foregroundStyle(Color("TextUnsetColor")))
+                        SecureField(placeholder, text: $text, prompt: Text(placeholder).foregroundStyle(Color(Color.textUnset)))
                     } else {
-                        TextField(placeholder, text: $text, prompt: Text(placeholder).foregroundStyle(Color("TextUnsetColor")))
+                        TextField(placeholder, text: $text, prompt: Text(placeholder).foregroundStyle(Color(Color.textUnset)))
                     }
                     Image(systemName: showSecureField ? "eye" : "eye.slash")
-                        .foregroundStyle(Color("TextUnsetColor"))
+                        .foregroundStyle(Color(Color.textUnset))
                         .onTapGesture {
                             self.showSecureField.toggle()
                         }
                 }
             }
-            .tint(Color("AccentColor"))
+            .tint(Color(Color.accentPrimaryShiori))
         }
         .frame(height: 20)
         .padding()
-        .background(Color("BgLightColor"))
+        .background(Color(Color.backgroundLightShiori))
         .clipShape(RoundedRectangle(cornerRadius: 15))
         .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
     }

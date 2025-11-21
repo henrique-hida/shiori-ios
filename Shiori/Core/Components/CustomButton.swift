@@ -22,11 +22,11 @@ struct ShioriButton: View {
             Group {
                 if style == .primary {
                     RoundedRectangle(cornerRadius: 15)
-                        .fill(Color("AccentColor"))
+                        .fill(Color(Color.accentPrimaryShiori))
                         .overlay(buttonText)
                 } else {
                     RoundedRectangle(cornerRadius: 15)
-                        .stroke(Color("AccentColor"), lineWidth: 2)
+                        .stroke(Color(Color.accentPrimaryShiori), lineWidth: 2)
                         .overlay(buttonText)
                 }
             }
@@ -38,7 +38,7 @@ struct ShioriButton: View {
     private var buttonText: some View {
         Text(title)
             .font(Font.custom("Roboto-Bold", size: 16))
-            .foregroundStyle(style == .primary ? Color("TextButtonColor") : Color("AccentColor"))
+            .foregroundStyle(style == .primary ? Color(Color.textButtonShiori) : Color(Color.accentPrimaryShiori))
     }
 }
 

@@ -8,6 +8,7 @@
 import Foundation
 import Observation
 import Combine
+import FirebaseAuth
 
 @MainActor
 @Observable
@@ -27,17 +28,39 @@ final class SessionManager {
         self.observeSession = observeSession
         self.start()
     }
-    
+
     private func start() {
         observeSession.execute()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] user in
                 if let user {
-                    self?.state = .authenticated(user)
+                    self?.verifyUserExistsOnServer { exists in
+                        if exists {
+                            self?.state = .authenticated(user)
+                        } else {
+                            self?.state = .unauthenticated
+                        }
+                    }
                 } else {
                     self?.state = .unauthenticated
                 }
             }
             .store(in: &cancellables)
+    }
+
+    private func verifyUserExistsOnServer(completion: @escaping (Bool) -> Void) {
+        if let firebaseUser = FirebaseAuth.Auth.auth().currentUser {
+            firebaseUser.reload { error in
+                if let error = error {
+                    print("Erro de validação (usuário pode ter sido deletado): \(error)")
+                    try? FirebaseAuth.Auth.auth().signOut()
+                    completion(false)
+                } else {
+                    completion(true)
+                }
+            }
+        } else {
+            completion(false)
+        }
     }
 }

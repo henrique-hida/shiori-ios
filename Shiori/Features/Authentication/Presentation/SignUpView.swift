@@ -16,195 +16,258 @@ struct SignUpView: View {
     }
     
     var body: some View {
-        @Bindable var viewModel = viewModel
-        
         GeometryReader { geo in
-            ZStack(alignment: .topLeading) {
-                //background
+            ZStack {
+                // background
                 Color(Color.backgroundShiori)
                     .ignoresSafeArea()
                 
-                if viewModel.signUpStep > 1 {
-                    Button {
-                        withAnimation {
-                            viewModel.goToPreviousStep()
-                        }
-                    } label: {
-                        HStack(spacing: 3) {
-                            Image(systemName: "chevron.left")
-                            Text("Back")
-                        }
-                        .appFont(16, weight: .regular)
-                        .foregroundStyle(Color.textMutedShiori)
-                    }
-                    .padding(.horizontal, 25)
-                    .zIndex(1)
-                    .transition(.opacity)
-                }
-                
-                //foreground
-                VStack {
-                    Spacer()
-                    
-                    ZStack {
-                        if viewModel.signUpStep == 1 {
-                            FirstStepView(viewModel: viewModel, availableWidth: geo.size.width, availableHeight: geo.size.height)
-                                .transition(.asymmetric(
-                                    insertion: .move(edge: .leading),
-                                    removal: .move(edge: .leading)
-                                ))
-                        } else {
-                            SecondStepView(viewModel: viewModel, availableWidth: geo.size.width, availableHeight: geo.size.height)
-                                .transition(.asymmetric(
-                                    insertion: .move(edge: .trailing),
-                                    removal: .move(edge: .trailing)
-                                ))
-                        }
-                    }
-                    .zIndex(10)
-                    
-                    VStack(spacing: 15) {
-                        VStack {
-                            Text("\(viewModel.signUpStep)/2").textSmall()
-                            RoundedRectangle(cornerRadius: 10)
-                                .frame(height: 10)
-                                .foregroundStyle(Color.backgroundLightShiori)
-                                .overlay(alignment: .leading) {
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .frame(width: (geo.size.width - 50) * (CGFloat(viewModel.signUpStep) * 0.5), height: 10)
-                                        .foregroundStyle(Color.accentPrimaryShiori)
-                                        .animation(.spring, value: viewModel.signUpStep)
-                                }
-                        }
-                        .padding(.bottom)
-                        
-                        ShioriButton(title: viewModel.buttonText, style: .primary) {
-                            if viewModel.signUpStep == 1 {
-                                withAnimation {
-                                    viewModel.goToNextStep()
+                // content
+                VStack(spacing: 0) {
+                    ScrollView {
+                        VStack(spacing: 0) {
+                            if viewModel.signUpStep > 1 {
+                                BackButton {
+                                    withAnimation { viewModel.goToPreviousStep() }
                                 }
                             } else {
-                                Task {
-                                    do {
-                                        try await viewModel.register()
-                                    }
-                                }
+                                Color.clear.frame(height: 44)
                             }
+                            
+                            VStack(spacing: 20) {
+                                TitleView(step: viewModel.signUpStep)
+                                    .padding(.top, 50)
+                                ShioriErrorBox(errorMessage: viewModel.errorMessage, type: .error)
+                                
+                                StepContentView(viewModel: viewModel, width: geo.size.width)
+                            }
+                            .padding(.horizontal, 25)
+                            .padding(.bottom, 25)
                         }
-                        
-                        HStack(spacing: 0) {
-                            Text("Already have an account? ").textSmall()
-                            Text("Sign in")
-                                .link()
-                                .onTapGesture {
-                                    viewModel.goToSignIn()
-                                }
-                        }
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    
+                    VStack(spacing: 20) {
+                        ProgressBar(currentStep: viewModel.signUpStep, totalSteps: 2, maxWidth: geo.size.width)
+                        SignUpButtonsView(viewModel: viewModel)
                     }
                     .padding(.horizontal, 25)
                     .padding(.bottom, 25)
+                    .padding(.top, 10)
+                    .background(Color.backgroundShiori)
                 }
             }
             .navigationDestination(isPresented: $viewModel.goToSignInView) {
                 SignInView()
             }
         }
+        .animation(.spring, value: viewModel.errorMessage)
+        .animation(.spring, value: viewModel.signUpStep)
     }
 }
 
-struct FirstStepView: View {
-    @Bindable var viewModel: SignUpViewModel
-    let availableWidth: CGFloat
-    let availableHeight: CGFloat
-    
+// MARK: - SubViews
+
+private struct BackButton: View {
+    let action: () -> Void
     var body: some View {
-        VStack {
-            VStack {
-                Text("Sign up!")
-                    .title()
-                Text("Create your account")
-                    .subTitle()
+        HStack {
+            Button(action: action) {
+                HStack(spacing: 5) {
+                    Image(systemName: "chevron.left")
+                    Text("Back")
+                }
+                .foregroundStyle(Color.textMutedShiori)
+                .appFont(16, weight: .regular)
             }
-            Spacer()
-            
-            VStack(spacing: 15) {
-                ShioriField(icon: "person", placeholder: "First name", text: $viewModel.firstName)
-                ShioriField(icon: "envelope", placeholder: "Email", text: $viewModel.email, keyboard: .emailAddress)
-                ShioriField(icon: "lock", placeholder: "Password", text: $viewModel.password, style: .secure)
-            }
-            
             Spacer()
         }
-        .padding(25)
-        .padding(.top, availableHeight * 0.15)
+        .padding(.horizontal, 25)
+        .padding(.top, 10)
+    }
+}
+
+private struct TitleView: View {
+    let step: Int
+    var body: some View {
+        VStack(spacing: 5) {
+            Text(step == 1 ? "Sign up!" : "Customize")
+                .title()
+            Text(step == 1 ? "Create your account" : "Your news preferences")
+                .subTitle()
+        }
+        .multilineTextAlignment(.center)
+    }
+}
+
+private struct ProgressBar: View {
+    let currentStep: Int
+    let totalSteps: Int
+    let maxWidth: CGFloat
+    
+    var body: some View {
+        VStack(spacing: 8) {
+            Text("\(currentStep)/\(totalSteps)").textSmall()
+            ZStack(alignment: .leading) {
+                RoundedRectangle(cornerRadius: 10)
+                    .frame(height: 6)
+                    .foregroundStyle(Color.backgroundLightShiori)
+                
+                RoundedRectangle(cornerRadius: 10)
+                    .frame(width: (maxWidth - 50) * (CGFloat(currentStep) / CGFloat(totalSteps)), height: 6)
+                    .foregroundStyle(Color.accentPrimaryShiori)
+            }
+            .frame(height: 6)
+        }
+        .padding(.bottom, 10)
+    }
+}
+
+private struct StepContentView: View {
+    @Bindable var viewModel: SignUpViewModel
+    let width: CGFloat
+    
+    var body: some View {
+        ZStack {
+            if viewModel.signUpStep == 1 {
+                FirstStepView(viewModel: viewModel)
+                    .padding(.vertical, 50)
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .leading).combined(with: .opacity),
+                        removal: .move(edge: .leading).combined(with: .opacity)
+                    ))
+            } else {
+                SecondStepView(viewModel: viewModel)
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .trailing).combined(with: .opacity),
+                        removal: .move(edge: .trailing).combined(with: .opacity)
+                    ))
+            }
+        }
+    }
+}
+
+private struct SignUpButtonsView: View {
+    @Bindable var viewModel: SignUpViewModel
+    
+    var body: some View {
+        VStack(spacing: 15) {
+            ShioriButton(title: viewModel.buttonText, style: .primary) {
+                Task {
+                    await viewModel.handleButtonPress()
+                }
+            }
+            .disabled(viewModel.isLoading)
+            .opacity(viewModel.isLoading ? 0.7 : 1)
+            
+            HStack(spacing: 0) {
+                Text("Already have an account? ").textSmall()
+                Text("Sign in")
+                    .link()
+                    .onTapGesture {
+                        viewModel.goToSignIn()
+                    }
+            }
+        }
+    }
+}
+
+// MARK: - Step Views
+
+struct FirstStepView: View {
+    @Bindable var viewModel: SignUpViewModel
+    
+    var body: some View {
+        VStack(spacing: 15) {
+            ShioriField(
+                icon: "person",
+                placeholder: "First name",
+                text: $viewModel.firstName
+            )
+            ShioriField(
+                icon: "envelope",
+                placeholder: "Email",
+                text: $viewModel.email,
+                keyboard: .emailAddress
+            )
+            ShioriField(
+                icon: "lock",
+                placeholder: "Password",
+                text: $viewModel.password,
+                style: .secure
+            )
+        }
     }
 }
 
 struct SecondStepView: View {
     @Bindable var viewModel: SignUpViewModel
-    let availableWidth: CGFloat
-    let availableHeight: CGFloat
     
     var body: some View {
-        VStack {
-            VStack(alignment: .leading) {
-                Text("Customize")
-                    .title()
-                Text("Your news")
-                    .title()
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
+        VStack(spacing: 15) {
+            ShioriSelector(
+                title: "Duration",
+                icon: "clock",
+                options: NewsDuration.allCases,
+                selection: $viewModel.selectedDuration,
+                textString: { $0.rawValue }
+            )
+            .zIndex(2)
             
-            Spacer()
+            ShioriSelector(
+                title: "Style",
+                icon: "newspaper",
+                options: NewsStyle.allCases,
+                selection: $viewModel.selectedStyle,
+                textString: { $0.rawValue }
+            )
+            .zIndex(1)
+            SubjectsGrid(viewModel: viewModel)
+        }
+    }
+}
+
+struct SubjectsGrid: View {
+    @Bindable var viewModel: SignUpViewModel
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Interests").textLarge()
             
-            VStack(spacing: 15) {
-                ShioriSelector(title: "Duration", icon: "clock", options: NewsDuration.allCases, selection: $viewModel.selectedDuration, textString: { $0.rawValue })
-                    .zIndex(3)
-                ShioriSelector(title: "Style", icon: "newspaper", options: NewsStyle.allCases, selection: $viewModel.selectedStyle, textString: { $0.rawValue })
-                    .zIndex(2)
-                
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Interests")
-                        .textLarge()
-                    
-                    let subjects = NewsSubject.allCases
-                    let columnCount = 2
-                    let rowCount = (subjects.count + columnCount - 1) / columnCount
-                    
-                    Grid(horizontalSpacing: 10, verticalSpacing: 10) {
-                        ForEach(0..<rowCount, id: \.self) { rowIndex in
-                            GridRow {
-                                ForEach(0..<columnCount, id: \.self) { columnIndex in
-                                    let itemIndex = (rowIndex * columnCount) + columnIndex
+            let subjects = NewsSubject.allCases
+            let columnCount = 2
+            let rowCount = (subjects.count + columnCount - 1) / columnCount
+            
+            Grid(horizontalSpacing: 10, verticalSpacing: 10) {
+                ForEach(0..<rowCount, id: \.self) { rowIndex in
+                    GridRow {
+                        ForEach(0..<columnCount, id: \.self) { columnIndex in
+                            let itemIndex = (rowIndex * columnCount) + columnIndex
+                            
+                            if itemIndex < subjects.count {
+                                let subject = subjects[itemIndex]
                                 
-                                    if itemIndex < subjects.count {
-                                        let subject = subjects[itemIndex]
-                                        
-                                        ShioriCheckbox(
-                                            title: subject.rawValue,
-                                            icon: subject.iconName,
-                                            isSelected: viewModel.selectedSubjects.contains(subject)
-                                        ) {
-                                            withAnimation(.snappy) {
-                                                if viewModel.selectedSubjects.contains(subject) {
-                                                    viewModel.selectedSubjects.remove(subject)
-                                                } else {
-                                                    viewModel.selectedSubjects.insert(subject)
-                                                }
-                                            }
+                                ShioriCheckbox(
+                                    title: subject.rawValue,
+                                    icon: subject.iconName,
+                                    isSelected: viewModel.selectedSubjects.contains(subject)
+                                ) {
+                                    withAnimation(.snappy) {
+                                        if viewModel.selectedSubjects.contains(subject) {
+                                            viewModel.selectedSubjects.remove(subject)
+                                        } else {
+                                            viewModel.selectedSubjects.insert(subject)
                                         }
-                                    } else {
-                                        Color.clear
                                     }
                                 }
+                            } else {
+                                Color.clear
                             }
                         }
                     }
                 }
             }
         }
-        .padding(25)
-        .padding(.top, availableHeight * 0.05)
     }
 }
 

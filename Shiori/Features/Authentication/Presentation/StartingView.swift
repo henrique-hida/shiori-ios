@@ -16,7 +16,7 @@ struct StartingView: View {
                 Color(Color.backgroundShiori)
                     .ignoresSafeArea()
                 
-                //foreground
+                //content
                 VStack(spacing: 10) {
                     HeroView(availableHeight: geo.size.height)
                     
@@ -32,7 +32,7 @@ struct StartingView: View {
     }
 }
 
-// MARK: SubViews
+// MARK: - SubViews
 private struct HeroView: View {
     var availableHeight: CGFloat
     

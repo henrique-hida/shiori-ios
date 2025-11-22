@@ -22,7 +22,7 @@ struct SignInView: View {
                 Color(Color.backgroundShiori)
                     .ignoresSafeArea()
                 
-                // foreground
+                // content
                 VStack {
                     WaveSignIn()
                         .fill(ImagePaint(image: Image("Pattern"), scale: 2))
@@ -58,7 +58,7 @@ struct SignInView: View {
     }
 }
 
-// MARK: SubViews
+// MARK: - SubViews
 private struct FieldsView: View {
     @Bindable var viewModel: SignInViewModel
     

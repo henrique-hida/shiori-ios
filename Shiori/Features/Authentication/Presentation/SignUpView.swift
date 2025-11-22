@@ -86,7 +86,7 @@ struct SignUpView: View {
                             } else {
                                 Task {
                                     do {
-                                        try await viewModel.signUp()
+                                        try await viewModel.register()
                                     }
                                 }
                             }

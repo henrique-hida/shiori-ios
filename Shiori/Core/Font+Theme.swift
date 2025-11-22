@@ -74,7 +74,7 @@ extension View {
     }
     
     func textButton() -> some View {
-        self.appFont(14, weight: .bold)
+        self.appFont(16, weight: .bold)
             .foregroundStyle(Color.textButton)
     }
     

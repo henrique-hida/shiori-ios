@@ -27,6 +27,7 @@ struct ShioriButton: View {
                 } else {
                     RoundedRectangle(cornerRadius: 15)
                         .stroke(Color(Color.accentPrimaryShiori), lineWidth: 2)
+                        .contentShape(RoundedRectangle(cornerRadius: 15))
                         .overlay(buttonText)
                 }
             }

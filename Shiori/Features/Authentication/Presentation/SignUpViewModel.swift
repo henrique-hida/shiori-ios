@@ -36,7 +36,7 @@ final class SignUpViewModel {
         self.signUp = signUp
     }
     
-    func register() async {
+    func register() async throws {
         isLoading = true
         errorMessage = nil
         
@@ -100,19 +100,5 @@ final class SignUpViewModel {
         guard signUpStep == 2 else { return }
         signUpStep -= 1
         buttonText = "Next"
-    }
-    
-    func signUp() async throws{
-        try await signUp.execute(request: SignUpRequest(
-            email: email,
-            password: password,
-            firstName: firstName,
-            isPremium: isPremium,
-            language: selectedLanguage,
-            schema: selectedTheme,
-            newsDuration: selectedDuration,
-            newsStyle: selectedStyle,
-            newsSubjects: Array(selectedSubjects),
-            newsArriveTime: arriveTime))
     }
 }

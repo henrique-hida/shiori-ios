@@ -8,12 +8,14 @@
 import Foundation
 import Observation
 
+@MainActor
 @Observable
 class SignInViewModel {
     var email: String = ""
     var password: String = ""
-    var isPasswordVisible: Bool = false
     var goToSignUpView: Bool = false
+    
+    var errorMessage: String? = nil
     
     private let signIn: SignInUseCase
     
@@ -21,17 +23,15 @@ class SignInViewModel {
         self.signIn = signIn
     }
     
-    func togglePassword() {
-        isPasswordVisible.toggle()
-    }
-    
-    func login() async throws {
-        Task {
-            do {
-                try await signIn.execute(email: email, password: password)
-            } catch {
-                print(error)
-            }
+    func login() async {
+        errorMessage = nil
+        do {
+            try await signIn.execute(email: email, password: password)
+        } catch let error as AuthError {
+            self.errorMessage = error.errorDescription
+        } catch {
+            self.errorMessage = error.localizedDescription
+            print(error)
         }
     }
     

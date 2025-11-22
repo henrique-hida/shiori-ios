@@ -16,8 +16,6 @@ struct SignInView: View {
     }
     
     var body: some View {
-        @Bindable var viewModel = viewModel
-        
         GeometryReader { geo in
             ZStack {
                 // background
@@ -25,67 +23,76 @@ struct SignInView: View {
                     .ignoresSafeArea()
                 
                 // foreground
-                VStack(spacing: 20) {
+                VStack {
                     WaveSignIn()
                         .fill(ImagePaint(image: Image("Pattern"), scale: 2))
                         .ignoresSafeArea(.all, edges: .top)
                         .frame(height: geo.size.height * 0.25)
+                        .padding(.bottom, 30)
                     
-                    Spacer()
-                    
-                    VStack {
-                        VStack {
-                            Text("Welcome")
+                    VStack(spacing: 20) {
+                        VStack(spacing: 5) {
+                            Text("Welcome back")
                                 .title()
-                            Text("Login into you account")
+                            Text("Login into your account")
                                 .subTitle()
                         }
                         
-                        Spacer()
-                        
-                        VStack(spacing: 15) {
-                            ShioriField(icon: "envelope", placeholder: "Email", text: $viewModel.email, keyboard: .emailAddress)
-                            
-                            ShioriField(icon: "lock", placeholder: "Password", text: $viewModel.password, style: .secure)
-                            
-                            HStack {
-                                Spacer()
-                                Text("Forgot your password?")
-                                    .link()
-                            }
-                        }
+                        ShioriErrorBox(errorMessage: viewModel.errorMessage, type: .error)
+                            .padding(.top)
                         
                         Spacer()
                         
-                        VStack(spacing: 15) {
-                            ShioriButton(title: "Login", style: .primary) {
-                                Task {
-                                    do {
-                                        try await viewModel.login()
-                                    } catch {
-                                        print(error)
-                                    }
-                                }
-                            }
-                            
-                            HStack(spacing: 0) {
-                                Text("Don't have an account? ")
-                                    .textSmall()
-                                Text("Sign up")
-                                    .link()
-                                    .onTapGesture {
-                                        viewModel.goToSignUp()
-                                    }
-                            }
-                        }
+                        FieldsView(viewModel: viewModel)
+                        
+                        Spacer()
+                        
+                        ButtonsView(viewModel: viewModel)
                     }
                     .padding(.horizontal, 25)
                     .padding(.bottom, 25)
                 }
             }
         }
-        .navigationDestination(isPresented: $viewModel.goToSignUpView) {
-            SignUpView()
+        .animation(.spring, value: viewModel.errorMessage)
+    }
+}
+
+// MARK: SubViews
+private struct FieldsView: View {
+    @Bindable var viewModel: SignInViewModel
+    
+    var body: some View {
+        VStack(spacing: 15) {
+            ShioriField(icon: "envelope", placeholder: "Email", text: $viewModel.email, keyboard: .emailAddress)
+            
+            ShioriField(icon: "lock", placeholder: "Password", text: $viewModel.password, style: .secure)
+            
+            HStack {
+                Spacer()
+                NavigationLink(destination: SignUpView()) {
+                    Text("Forgot your password?").link()
+                }
+            }
+        }
+    }
+}
+
+private struct ButtonsView: View {
+    @Bindable var viewModel: SignInViewModel
+    
+    var body: some View {
+        VStack(spacing: 15) {
+            ShioriButton(title: "Login", style: .primary) {
+                Task { await viewModel.login() }
+            }
+            HStack(spacing: 0) {
+                Text("Don't have an account? ")
+                    .textSmall()
+                NavigationLink(destination: SignUpView()) {
+                    Text("Sign up").link()
+                }
+            }
         }
     }
 }

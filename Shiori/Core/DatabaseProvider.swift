@@ -8,16 +8,13 @@
 import Foundation
 import SwiftData
 
-final class DatabaseProvider {
+final class DatabaseProvider: Sendable {
     static let shared = DatabaseProvider()
     let container: ModelContainer
     
     init(inMemory: Bool = false) {
         let schema = Schema([
-            AppUser.self,
-            NewsPreferences.self,
-            Summary.self,
-            News.self
+            NewsData.self
         ])
         
         let modelConfiguration = ModelConfiguration(

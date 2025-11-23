@@ -13,10 +13,10 @@ import FirebaseAuth
 @MainActor
 @Observable
 final class SessionManager {
-    enum State {
+    enum State: Equatable {
         case checking
         case unauthenticated
-        case authenticated(AppUser)
+        case authenticated(UserProfile)
     }
     
     var state: State = .checking
@@ -32,35 +32,26 @@ final class SessionManager {
     private func start() {
         observeSession.execute()
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] user in
-                if let user {
-                    self?.verifyUserExistsOnServer { exists in
-                        if exists {
-                            self?.state = .authenticated(user)
-                        } else {
-                            self?.state = .unauthenticated
-                        }
+            .sink { [weak self] userProfile in
+                guard let self = self else { return }
+                
+                if let user = userProfile {
+                    if case .authenticated(let currentUser) = self.state, currentUser.id == user.id {
+                        return
                     }
+                    self.state = .authenticated(user)
                 } else {
-                    self?.state = .unauthenticated
+                    self.state = .unauthenticated
                 }
             }
             .store(in: &cancellables)
     }
-
-    private func verifyUserExistsOnServer(completion: @escaping (Bool) -> Void) {
-        if let firebaseUser = FirebaseAuth.Auth.auth().currentUser {
-            firebaseUser.reload { error in
-                if let error = error {
-                    print("Erro de validação (usuário pode ter sido deletado): \(error)")
-                    try? FirebaseAuth.Auth.auth().signOut()
-                    completion(false)
-                } else {
-                    completion(true)
-                }
-            }
-        } else {
-            completion(false)
-        }
+    
+    func signIn(with user: UserProfile) {
+        self.state = .authenticated(user)
+    }
+    
+    func signOut() {
+        try? FirebaseAuth.Auth.auth().signOut()
     }
 }

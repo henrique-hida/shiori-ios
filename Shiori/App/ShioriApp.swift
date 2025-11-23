@@ -22,10 +22,8 @@ struct ShioriApp: App {
     
     var body: some Scene {
         WindowGroup {
-            NavigationStack {
-                RootView()
-                    .environment(sessionManager)
-            }
+            RootView()
+                .environment(sessionManager)
         }
         .modelContainer(DatabaseProvider.shared.container)
     }

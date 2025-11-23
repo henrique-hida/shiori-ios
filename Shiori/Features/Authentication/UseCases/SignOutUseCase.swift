@@ -8,7 +8,7 @@
 import Foundation
 
 struct SignOutUseCase {
-    let authRepo: AuthRepository
+    let authRepo: AuthRepositoryProtocol
     
     func execute() throws {
         try authRepo.signOut()

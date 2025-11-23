@@ -19,7 +19,7 @@ struct AuthDataResult {
     }
 }
 
-final class FirebaseAuthRepository: AuthRepository {
+final class FirebaseAuthRepository: AuthRepositoryProtocol {
     private let authStateSubject = CurrentValueSubject<String?, Never>(Auth.auth().currentUser?.uid)
     private var handle: AuthStateDidChangeListenerHandle?
     

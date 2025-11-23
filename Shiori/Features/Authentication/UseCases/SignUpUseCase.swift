@@ -8,35 +8,31 @@
 import Foundation
 
 struct SignUpUseCase {
-    let authRepo: AuthRepository
-    let newsRepo: NewsDatabaseRepository
-    let userRepo: UserPersistence
+    let authRepo: AuthRepositoryProtocol
+    let userRepo: UserRepositoryProtocol
     
-    func execute(request: SignUpRequest) async throws {
+    func execute(request: SignUpRequest) async throws -> UserProfile {
         let authId = try await authRepo.signUp(email: request.email, password: request.password)
-        
+        let newUserProfile = UserProfile(
+            id: authId,
+            firstName: request.firstName,
+            isPremium: false,
+            language: request.language,
+            theme: .system,
+            weekStreak: [false, false, false, false, false, false, false],
+            newsPreferences: NewsPreferences(
+                duration: request.newsDuration,
+                style: request.newsStyle,
+                subjects: request.newsSubjects,
+                language: request.language,
+                arriveTime: request.newsArriveTime
+            )
+        )
         do {
-            let preferences = NewsPreferences(
-                newsDuration: request.newsDuration,
-                newsStyle: request.newsStyle,
-                newsSubjects: request.newsSubjects,
-                newsLanguage: request.language,
-                newsArriveTime: request.newsArriveTime
-            )
-            
-            let apiRequestDTO: NewsRequestBody = NewsMapper.mapToDTO(from: preferences)
-            let newsResponseDTO: NewsResponseDTO = try await newsRepo.getTodayNews(newsPreferences: apiRequestDTO)
-            let initialNews = NewsMapper.mapToEntity(from: newsResponseDTO)
-            let newUser = UserMapper.map(
-                request: request,
-                id: authId,
-                initialNews: initialNews,
-                preferences: preferences
-            )
-            try await userRepo.save(newUser)
-            
+            try await userRepo.save(newUserProfile)
+            return newUserProfile
         } catch {
-            print("Save failed. Rolling back Auth...")
+            print("❌ Save Profile failed. Rolling back Auth...")
             try? await authRepo.deleteCurrentUser()
             throw error
         }

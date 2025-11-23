@@ -16,10 +16,13 @@ struct RootView: View {
             case .checking:
                 ProgressView()
             case .unauthenticated:
-                StartingView()
-            case .authenticated(let user):
-                HomeView(user: user)
+                NavigationStack {
+                    StartingView()
+                }
+            case .authenticated(let userProfile):
+                HomeView(user: userProfile)
             }
         }
+        .animation(.easeInOut, value: sessionManager.state)
     }
 }

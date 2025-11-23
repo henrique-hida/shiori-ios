@@ -8,7 +8,7 @@
 import Foundation
 
 struct SignInUseCase {
-    let authRepo: AuthRepository
+    let authRepo: AuthRepositoryProtocol
     
     func execute(email: String, password: String) async throws {
         try await authRepo.signIn(email: email, password: password)

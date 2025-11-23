@@ -12,15 +12,16 @@ import SwiftData
 final class DependencyFactory {
     static let shared = DependencyFactory()
 
-    private let authRepo: AuthRepository
-    private let userRepo: UserPersistence
-    private let newsRepo: NewsDatabaseRepository
+    private let authRepo: AuthRepositoryProtocol
+    private let userRepo: UserRepositoryProtocol
+    private let localNewsRepo: LocalNewsRepositoryProtocol
     
     private init() {
         let dbContext = DatabaseProvider.shared.container.mainContext
+        
         self.authRepo = FirebaseAuthRepository()
-        self.userRepo = SwiftDataUserRepository(context: dbContext)
-        self.newsRepo = MockNewsDatabaseRepository()
+        self.userRepo = FirestoreUserRepository()
+        self.localNewsRepo = LocalNewsRepository(context: dbContext)
     }
     
     func makeSessionManager() -> SessionManager {
@@ -39,9 +40,16 @@ final class DependencyFactory {
     func makeSignUpViewModel() -> SignUpViewModel {
         let useCase = SignUpUseCase(
             authRepo: authRepo,
-            newsRepo: newsRepo,
             userRepo: userRepo
         )
         return SignUpViewModel(signUp: useCase)
+    }
+    
+    func makeHomeViewModel() -> HomeViewModel {
+        let cloudRepo = FirestoreNewsRepository()
+        return HomeViewModel(
+            localRepo: localNewsRepo,
+            cloudRepo: cloudRepo
+        )
     }
 }

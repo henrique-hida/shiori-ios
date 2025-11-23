@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		B458AC162EC0E04F0092F26C /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = B458AC152EC0E04F0092F26C /* FirebaseAuth */; };
 		B458AC1C2EC0E16A0092F26C /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = B458AC1B2EC0E16A0092F26C /* FirebaseAnalytics */; };
+		B4702EE72ED21D9C00B8F189 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = B4702EE62ED21D9C00B8F189 /* FirebaseFirestore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -88,6 +89,7 @@
 			files = (
 				B458AC1C2EC0E16A0092F26C /* FirebaseAnalytics in Frameworks */,
 				B458AC162EC0E04F0092F26C /* FirebaseAuth in Frameworks */,
+				B4702EE72ED21D9C00B8F189 /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -158,6 +160,7 @@
 			packageProductDependencies = (
 				B458AC152EC0E04F0092F26C /* FirebaseAuth */,
 				B458AC1B2EC0E16A0092F26C /* FirebaseAnalytics */,
+				B4702EE62ED21D9C00B8F189 /* FirebaseFirestore */,
 			);
 			productName = Shiori;
 			productReference = B44B00FD2EBE7BDD00CE96EE /* Shiori.app */;
@@ -692,6 +695,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B458AC132EC0DEF70092F26C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAnalytics;
+		};
+		B4702EE62ED21D9C00B8F189 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B458AC132EC0DEF70092F26C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

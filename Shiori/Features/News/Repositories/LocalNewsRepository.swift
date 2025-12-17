@@ -37,6 +37,24 @@ final class LocalNewsRepository: LocalNewsRepositoryProtocol {
             }
         }
         try context.save()
+        try deleteOldNews()
+    }
+    
+    private func deleteOldNews() throws {
+        let calendar = Calendar.current
+        let sevenDaysAgo = calendar.date(byAdding: .day, value: -7, to: calendar.startOfDay(for: Date()))!
+        
+        let descriptor = FetchDescriptor<NewsData>(
+            predicate: #Predicate { $0.date < sevenDaysAgo }
+        )
+        
+        let oldNews = try context.fetch(descriptor)
+        
+        for news in oldNews {
+            context.delete(news)
+        }
+        
+        try context.save()
     }
     
     func fetchNews(forDate date: Date) throws -> [News] {
@@ -45,6 +63,27 @@ final class LocalNewsRepository: LocalNewsRepositoryProtocol {
         let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay)!
         let descriptor = FetchDescriptor<NewsData>(
             predicate: #Predicate { $0.date >= startOfDay && $0.date < endOfDay }
+        )
+        let savedNews = try context.fetch(descriptor)
+        
+        return savedNews.map { news in
+            News(
+                id: news.id,
+                category: news.category,
+                content: news.content,
+                date: news.date,
+                tone: news.tone,
+                wasRead: news.wasRead
+            )
+        }
+    }
+    
+    func fetchWeekNews() throws -> [News] {
+        let calendar = Calendar.current
+        let sevenDaysAgo = calendar.date(byAdding: .day, value: -7, to: calendar.startOfDay(for: Date()))!
+        let descriptor = FetchDescriptor<NewsData>(
+            predicate: #Predicate { $0.date >= sevenDaysAgo },
+            sortBy: [SortDescriptor(\.date, order: .reverse)]
         )
         let savedNews = try context.fetch(descriptor)
         

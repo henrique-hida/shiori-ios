@@ -15,12 +15,10 @@ final class HomeViewModel {
     var isLoading = false
     var errorMessage: String? = nil
     
-    private let localRepo: LocalNewsRepositoryProtocol
-    private let cloudRepo: CloudNewsRepositoryProtocol
+    private let syncService: NewsSyncService
     
-    init(localRepo: LocalNewsRepositoryProtocol, cloudRepo: CloudNewsRepositoryProtocol) {
-        self.localRepo = localRepo
-        self.cloudRepo = cloudRepo
+    init(syncService: NewsSyncService) {
+        self.syncService = syncService
     }
     
     func loadNews(for user: UserProfile) async {
@@ -28,25 +26,16 @@ final class HomeViewModel {
         errorMessage = nil
         
         do {
-            let today = Date()
-            let localNews = try localRepo.fetchNews(forDate: today)
+            let weekNews = try await syncService.syncAndLoadWeek(for: user)
+            self.newsArticles = weekNews
             
-            if !localNews.isEmpty {
-                self.newsArticles = localNews.map {
-                    News(id: $0.id, category: $0.category, content: $0.content, date: $0.date, tone: $0.tone, wasRead: $0.wasRead)
-                }
-            } else {
-                let fetchedArticles = try await cloudRepo.getTodayNews(preferences: user.newsPreferences)
-                let dbObjects = fetchedArticles.map {
-                    News(id: $0.id, category: $0.category, content: $0.content, date: $0.date, tone: $0.tone, wasRead: false)
-                }
-                try await localRepo.saveNews(dbObjects)
-                
-                self.newsArticles = fetchedArticles
+            if weekNews.isEmpty {
+                self.errorMessage = "No news history found."
             }
+            
         } catch {
-            print("❌ News Load Error: \(error)")
-            self.errorMessage = "Failed to load news."
+            print("❌ Critical Error: \(error)")
+            self.errorMessage = "Failed to load news database."
         }
         
         isLoading = false

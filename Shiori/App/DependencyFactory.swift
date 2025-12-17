@@ -46,8 +46,13 @@ final class DependencyFactory {
     }
     
     func makeHomeViewModel() -> HomeViewModel {
+        let service = makeNewsSyncService()
+        return HomeViewModel(syncService: service)
+    }
+    
+    func makeNewsSyncService() -> NewsSyncService {
         let cloudRepo = FirestoreNewsRepository()
-        return HomeViewModel(
+        return NewsSyncService(
             localRepo: localNewsRepo,
             cloudRepo: cloudRepo
         )

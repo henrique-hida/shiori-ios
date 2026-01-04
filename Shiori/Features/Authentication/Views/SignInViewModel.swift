@@ -34,18 +34,30 @@ class SignInViewModel {
         }
     }
     
-    func isValidEmail(_ email: String) -> Bool {
+    func isValidEmail(_ email: String) throws {
+        let trimmedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmedEmail.isEmpty {
+            throw ValidationError.emptyField("email")
+        }
         let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
-        let range = NSRange(location: 0, length: email.utf16.count)
-        let matches = detector?.matches(in: email, options: [], range: range)
-        return matches?.first?.url?.scheme == "mailto" && matches?.first?.range.length == range.length
+        let range = NSRange(location: 0, length: trimmedEmail.utf16.count)
+        let matches = detector?.matches(in: trimmedEmail, options: [], range: range)
+        let isMatch = matches?.first?.url?.scheme == "mailto" && matches?.first?.range.length == range.length
+        if !isMatch {
+            throw ValidationError.invalidEmailFormat
+        }
     }
     
-    func isValidPassword(_ password: String) -> Bool {
+    func isValidPassword(_ password: String) throws{
         let trimmedPassword = password.trimmingCharacters(in: .whitespacesAndNewlines)
-        if trimmedPassword.count >= 10 {
-            return true
+        if trimmedPassword.isEmpty {
+            throw ValidationError.emptyField("password")
         }
-        return false
+        if trimmedPassword.count < 10 {
+            throw ValidationError.passwordTooShort
+        }
+        if trimmedPassword.count > 64 {
+            throw ValidationError.passwordTooLong
+        }
     }
 }

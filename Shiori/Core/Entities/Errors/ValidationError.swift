@@ -7,8 +7,9 @@
 
 import Foundation
 
-enum ValidationError: Error, LocalizedError {
+enum ValidationError: Error, LocalizedError, Equatable {
     case emptyField(String)
+    case invalidEmailFormat
     case passwordTooShort
     case passwordTooLong
     
@@ -16,6 +17,8 @@ enum ValidationError: Error, LocalizedError {
         switch self {
         case .emptyField(let fieldName):
             return "Please fill the \(fieldName) field."
+        case .invalidEmailFormat:
+            return "The email address is badly formatted."
         case .passwordTooShort:
             return "Password must be at least 6 characters."
         case .passwordTooLong:

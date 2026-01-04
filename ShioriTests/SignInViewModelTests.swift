@@ -21,24 +21,35 @@ import Combine
         self.vm = SignInViewModel(signIn: useCase)
     }
     
-    @Test("Valid email tests") func testValidEmail() {
+    @Test("Valid emails test") func testValidEmails() throws {
         let validEmails: [String] = ["test@example.com", "first.last@company.com.br", "user+tag@gmail.com", "123@digits.net"]
         for email in validEmails {
-            #expect(vm.isValidEmail(email) == true)
+            try vm.isValidEmail(email)
         }
     }
     
-    @Test("Invalid email tests") func testInvalidEmail() {
-        let invalidEmails: [String] = ["", "plainaddress", "@example.com", "user@","user@.com","user@com", "http://google.com"]
-        for email in invalidEmails {
-            #expect(vm.isValidEmail(email) == false)
-        }
-    }
-    
-    @Test("Invalid range email tests") func testInvalidEmailRange() {
-        let invalidRangeEmails: [String] = [" test@example.com", "test@example.com ", "Email: test@example.com", "test@example.com\n"]
+    @Test("Valid trimmed emails test") func testValidTrimmedEmails() throws {
+        let invalidRangeEmails: [String] = [" test@example.com", "test@example.com ", "test@example.com\n"]
         for email in invalidRangeEmails {
-            #expect(vm.isValidEmail(email) == false)
+            try vm.isValidEmail(email)
+        }
+    }
+    
+    @Test("Empty emails test") func testEmptyEmails() throws {
+        let emptyEmails: [String] = ["", " ", "   "]
+        for email in emptyEmails {
+            #expect(throws: ValidationError.emptyField("email")) {
+                try vm.isValidEmail(email)
+            }
+        }
+    }
+    
+    @Test("Invalid emails test") func testInvalidEmails() throws {
+        let invalidEmails: [String] = ["plainaddress", "@example.com", "user@","user@.com","user@com", "http://google.com", "Email: test@example.com"]
+        for email in invalidEmails {
+            #expect(throws: ValidationError.invalidEmailFormat) {
+                try vm.isValidEmail(email)
+            }
         }
     }
 }
@@ -55,17 +66,35 @@ import Combine
         self.vm = SignInViewModel(signIn: useCase)
     }
     
-    @Test("Valid passwords tests") func testValidPassword() {
+    @Test("Valid passwords test") func testValidPasswords() throws {
         let validPasswords: [String] = ["Shiori123@", "@!091mjpSc", "passwordss"]
         for password in validPasswords {
-            #expect(vm.isValidPassword(password) == true)
+            try vm.isValidPassword(password)
         }
     }
     
-    @Test("Invalid passwords tests") func testInvalidPassword() {
-        let invalidPasswords: [String] = ["Shiori123", "@!091mjpS", "passwords", "", " "]
-        for password in invalidPasswords {
-            #expect(vm.isValidPassword(password) == false)
+    @Test("Empty passwords test") func testEmptyPasswords() throws {
+        let emptyPasswords: [String] = ["", " ", "   "]
+        for password in emptyPasswords {
+            #expect(throws: ValidationError.emptyField("password")) {
+                try vm.isValidPassword(password)
+            }
+        }
+    }
+    
+    @Test("Short passwords test") func testShortPasswords() throws {
+        let shortPasswords: [String] = ["Shiori123", "@!091mjpS", "passwords"]
+        for password in shortPasswords {
+            #expect(throws: ValidationError.passwordTooShort) {
+                try vm.isValidPassword(password)
+            }
+        }
+    }
+    
+    @Test("Long passwords test") func testLongPasswords() throws {
+        let longPassword = "12345678901234567890123456789012345678901234567890123456789012345"
+        #expect(throws: ValidationError.passwordTooLong) {
+            try vm.isValidPassword(longPassword)
         }
     }
 }

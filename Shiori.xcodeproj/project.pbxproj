@@ -20,19 +20,11 @@
 			remoteGlobalIDString = B44B00FC2EBE7BDD00CE96EE;
 			remoteInfo = Shiori;
 		};
-		B44B01172EBE7BDE00CE96EE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = B44B00F52EBE7BDD00CE96EE /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = B44B00FC2EBE7BDD00CE96EE;
-			remoteInfo = Shiori;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		B44B00FD2EBE7BDD00CE96EE /* Shiori.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Shiori.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B44B010C2EBE7BDE00CE96EE /* ShioriTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShioriTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		B44B01162EBE7BDE00CE96EE /* ShioriUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShioriUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -42,13 +34,6 @@
 				"App/GoogleService-Info.plist",
 			);
 			target = B44B010B2EBE7BDE00CE96EE /* ShioriTests */;
-		};
-		B46E4A722ED02101002BADD9 /* Exceptions for "Shiori" folder in "ShioriUITests" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				"App/GoogleService-Info.plist",
-			);
-			target = B44B01152EBE7BDE00CE96EE /* ShioriUITests */;
 		};
 		B4DFE8A42EC2665F00CC0516 /* Exceptions for "Shiori" folder in "Shiori" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
@@ -65,7 +50,6 @@
 			exceptions = (
 				B4DFE8A42EC2665F00CC0516 /* Exceptions for "Shiori" folder in "Shiori" target */,
 				B46E4A712ED02101002BADD9 /* Exceptions for "Shiori" folder in "ShioriTests" target */,
-				B46E4A722ED02101002BADD9 /* Exceptions for "Shiori" folder in "ShioriUITests" target */,
 			);
 			path = Shiori;
 			sourceTree = "<group>";
@@ -73,11 +57,6 @@
 		B44B010F2EBE7BDE00CE96EE /* ShioriTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = ShioriTests;
-			sourceTree = "<group>";
-		};
-		B44B01192EBE7BDE00CE96EE /* ShioriUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = ShioriUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -100,13 +79,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		B44B01132EBE7BDE00CE96EE /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -115,7 +87,6 @@
 			children = (
 				B44B00FF2EBE7BDD00CE96EE /* Shiori */,
 				B44B010F2EBE7BDE00CE96EE /* ShioriTests */,
-				B44B01192EBE7BDE00CE96EE /* ShioriUITests */,
 				B458AC142EC0E04F0092F26C /* Frameworks */,
 				B44B00FE2EBE7BDD00CE96EE /* Products */,
 			);
@@ -126,7 +97,6 @@
 			children = (
 				B44B00FD2EBE7BDD00CE96EE /* Shiori.app */,
 				B44B010C2EBE7BDE00CE96EE /* ShioriTests.xctest */,
-				B44B01162EBE7BDE00CE96EE /* ShioriUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -189,29 +159,6 @@
 			productReference = B44B010C2EBE7BDE00CE96EE /* ShioriTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		B44B01152EBE7BDE00CE96EE /* ShioriUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = B44B01262EBE7BDE00CE96EE /* Build configuration list for PBXNativeTarget "ShioriUITests" */;
-			buildPhases = (
-				B44B01122EBE7BDE00CE96EE /* Sources */,
-				B44B01132EBE7BDE00CE96EE /* Frameworks */,
-				B44B01142EBE7BDE00CE96EE /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				B44B01182EBE7BDE00CE96EE /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				B44B01192EBE7BDE00CE96EE /* ShioriUITests */,
-			);
-			name = ShioriUITests;
-			packageProductDependencies = (
-			);
-			productName = ShioriUITests;
-			productReference = B44B01162EBE7BDE00CE96EE /* ShioriUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -226,10 +173,6 @@
 						CreatedOnToolsVersion = 26.1;
 					};
 					B44B010B2EBE7BDE00CE96EE = {
-						CreatedOnToolsVersion = 26.1;
-						TestTargetID = B44B00FC2EBE7BDD00CE96EE;
-					};
-					B44B01152EBE7BDE00CE96EE = {
 						CreatedOnToolsVersion = 26.1;
 						TestTargetID = B44B00FC2EBE7BDD00CE96EE;
 					};
@@ -254,7 +197,6 @@
 			targets = (
 				B44B00FC2EBE7BDD00CE96EE /* Shiori */,
 				B44B010B2EBE7BDE00CE96EE /* ShioriTests */,
-				B44B01152EBE7BDE00CE96EE /* ShioriUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -268,13 +210,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		B44B010A2EBE7BDE00CE96EE /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		B44B01142EBE7BDE00CE96EE /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -298,13 +233,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		B44B01122EBE7BDE00CE96EE /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -312,11 +240,6 @@
 			isa = PBXTargetDependency;
 			target = B44B00FC2EBE7BDD00CE96EE /* Shiori */;
 			targetProxy = B44B010D2EBE7BDE00CE96EE /* PBXContainerItemProxy */;
-		};
-		B44B01182EBE7BDE00CE96EE /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = B44B00FC2EBE7BDD00CE96EE /* Shiori */;
-			targetProxy = B44B01172EBE7BDE00CE96EE /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -583,56 +506,6 @@
 			};
 			name = Release;
 		};
-		B44B01272EBE7BDE00CE96EE /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 5R9VB7Y576;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
-				MACOSX_DEPLOYMENT_TARGET = 26.1;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = cohida.ShioriUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = auto;
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_TARGET_NAME = Shiori;
-				XROS_DEPLOYMENT_TARGET = 26.1;
-			};
-			name = Debug;
-		};
-		B44B01282EBE7BDE00CE96EE /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 5R9VB7Y576;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
-				MACOSX_DEPLOYMENT_TARGET = 26.1;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = cohida.ShioriUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = auto;
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_TARGET_NAME = Shiori;
-				XROS_DEPLOYMENT_TARGET = 26.1;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -659,15 +532,6 @@
 			buildConfigurations = (
 				B44B01242EBE7BDE00CE96EE /* Debug */,
 				B44B01252EBE7BDE00CE96EE /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		B44B01262EBE7BDE00CE96EE /* Build configuration list for PBXNativeTarget "ShioriUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				B44B01272EBE7BDE00CE96EE /* Debug */,
-				B44B01282EBE7BDE00CE96EE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

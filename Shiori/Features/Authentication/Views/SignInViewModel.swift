@@ -33,4 +33,19 @@ class SignInViewModel {
             print(error)
         }
     }
+    
+    func isValidEmail(_ email: String) -> Bool {
+        let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
+        let range = NSRange(location: 0, length: email.utf16.count)
+        let matches = detector?.matches(in: email, options: [], range: range)
+        return matches?.first?.url?.scheme == "mailto" && matches?.first?.range.length == range.length
+    }
+    
+    func isValidPassword(_ password: String) -> Bool {
+        let trimmedPassword = password.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmedPassword.count >= 10 {
+            return true
+        }
+        return false
+    }
 }

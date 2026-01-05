@@ -22,147 +22,131 @@ final class SignUpViewModel {
     var selectedDuration: NewsDuration = .standard
     var selectedStyle: NewsStyle = .informal
     var selectedSubjects: Set<NewsSubject> = []
-    var arriveTime: Int = 6
+    var selectedArriveTime: Int = 6
     
     var signUpStep = 1
     var buttonText = "Next"
     var isLoading = false
     
     var errorMessage: String? = nil
+    var firstNameErrorMessage: String? = nil
+    var emailErrorMessage: String? = nil
+    var passwordErrorMessage: String? = nil
+    
     var registeredUser: UserProfile? = nil
     
-    private let signUp: SignUpUseCase
+    private let validator: CredentialsValidator = CredentialsValidator()
+    private let authRepo: AuthRepositoryProtocol
+    private let userRepo: UserRepositoryProtocol
     
-    init(signUp: SignUpUseCase) {
-        self.signUp = signUp
+    init(authRepo: AuthRepositoryProtocol, userRepo: UserRepositoryProtocol) {
+        self.authRepo = authRepo
+        self.userRepo = userRepo
     }
     
     func handleButtonPress() async {
-        errorMessage = nil
+        resetErrors()
         
-        if signUpStep == 1 {
-            validateStepOne()
-        } else {
-            if validateStepTwo() {
-                await register()
+        do {
+            if signUpStep == 1 {
+                try validator.isValidFirstName(firstName)
+                try validator.isValidEmail(email)
+                try validator.isValidPassword(password)
+                advanceToNextStep()
+            } else {
+                try validator.isValidNewsSubjects(selectedSubjects)
+                try await register()
             }
+        } catch let error as ValidationError {
+            applyErrorToField(error)
+        } catch let error as AuthError {
+            handleAuthError(error)
+        } catch {
+            self.errorMessage = error.localizedDescription
+            print(error)
         }
     }
     
-    func goToPreviousStep() {
-        guard signUpStep > 1 else { return }
+    func resetErrors() {
         errorMessage = nil
-        signUpStep -= 1
-        buttonText = "Next"
-    }
-
-    private func validateStepOne() {
-        let errors = collectValidationErrors()
-        if errors.isEmpty {
-            advanceToNextStep()
-        } else {
-            displayErrors(errors)
-        }
+        firstNameErrorMessage = nil
+        emailErrorMessage = nil
+        passwordErrorMessage = nil
     }
     
-    private func validateStepTwo() -> Bool {
-        if selectedSubjects.isEmpty {
-            displayErrors(["• Please select at least one subject of interest."])
-            return false
-        }
-        return true
-    }
-
-    private func collectValidationErrors() -> [String] {
-        return [
-            validateFirstName(),
-            validateEmail(),
-            validatePassword()
-        ].compactMap { $0 }
-    }
-
-    private func validateFirstName() -> String? {
-        guard !firstName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            return "• Please fill the First name field."
-        }
-        return nil
-    }
-
-    private func validateEmail() -> String? {
-        let cleanEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
-        if cleanEmail.isEmpty {
-            return "• Please fill the Email field."
-        }
-        if !cleanEmail.contains("@") || !cleanEmail.contains(".") {
-            return "• Invalid email format."
-        }
-        return nil
-    }
-
-    private func validatePassword() -> String? {
-        if password.isEmpty {
-            return "• Please fill the Password field."
-        }
-        if password.count < 10 {
-            return "• Password must be at least 10 characters long."
-        }
-        if password.count > 64 {
-            return "• Password is too long."
-        }
-        return nil
-    }
-
     private func advanceToNextStep() {
         withAnimation {
             signUpStep = 2
             buttonText = "Create Account"
         }
     }
-
-    private func displayErrors(_ errors: [String]) {
-        withAnimation {
-            self.errorMessage = errors.joined(separator: "\n")
+    
+    func goToPreviousStep() {
+        guard signUpStep > 1 else {
+            return
         }
+        resetErrors()
+        signUpStep -= 1
+        buttonText = "Next"
     }
     
-    func register() async {
+    func register() async throws {
         isLoading = true
-        errorMessage = nil
+        defer { isLoading = false }
         
-        do {
-            let request = SignUpRequest(
-                email: email,
-                password: password,
-                firstName: firstName,
-                isPremium: isPremium,
+        let user = try await signUp()
+        self.registeredUser = user
+        print("Success!")
+    }
+    
+    func signUp() async throws -> UserProfile {
+        let authId = try await authRepo.signUp(email, password)
+        let newUserProfile = UserProfile(
+            id: authId,
+            firstName: firstName,
+            isPremium: false,
+            language: selectedLanguage,
+            theme: .system,
+            weekStreak: [],
+            newsPreferences: NewsPreferences(
+                duration: selectedDuration,
+                style: selectedStyle,
+                subjects: Array(selectedSubjects),
                 language: selectedLanguage,
-                schema: selectedTheme,
-                newsDuration: selectedDuration,
-                newsStyle: selectedStyle,
-                newsSubjects: Array(selectedSubjects),
-                newsArriveTime: arriveTime
+                arriveTime: selectedArriveTime
             )
-            
-            let user = try await signUp.execute(request: request)
-            self.registeredUser = user
-            print("Success!")
-            
-        } catch let error as AuthError {
-            handleAuthError(error)
-        } catch let error as ValidationError {
-            errorMessage = error.errorDescription
+        )
+        do {
+            try await userRepo.save(newUserProfile)
+            return newUserProfile
         } catch {
-            errorMessage = "An unexpected error occurred."
+            print("❌ Save Profile failed. Rolling back Auth...")
+            try? await authRepo.deleteCurrentUser()
+            throw error
         }
-        
-        isLoading = false
     }
     
     private func handleAuthError(_ error: AuthError) {
-        if case .emailAlreadyInUse = error {
-            signUpStep = 1
-            buttonText = "Next"
-        }
+        signUpStep = 1
+        buttonText = "Next"
         self.errorMessage = error.errorDescription
+    }
+    
+    private func applyErrorToField(_ error: ValidationError) {
+        guard let field = error.affectedField else {
+            self.errorMessage = error.localizedDescription
+            return
+        }
+        
+        switch field {
+        case "first name":
+            self.firstNameErrorMessage = error.localizedDescription
+        case "email":
+            self.emailErrorMessage = error.localizedDescription
+        case "password":
+            self.passwordErrorMessage = error.localizedDescription
+        default:
+            self.errorMessage = error.localizedDescription
+        }
     }
 }

@@ -38,7 +38,6 @@ struct SignUpView: View {
                             VStack(spacing: 20) {
                                 TitleView(step: viewModel.signUpStep)
                                     .padding(.top, 50)
-                                ShioriErrorBox(errorMessage: viewModel.errorMessage, type: .error)
                                 
                                 StepContentView(viewModel: viewModel, width: geo.size.width)
                             }
@@ -180,17 +179,21 @@ struct FirstStepView: View {
     
     var body: some View {
         VStack(spacing: 15) {
+            ShioriErrorBox(errorMessage: viewModel.errorMessage, type: .error)
+            
             ShioriField(
                 icon: "person",
                 placeholder: "First name",
-                text: $viewModel.firstName
+                text: $viewModel.firstName,
+                errorMessage: viewModel.firstNameErrorMessage
             )
             
             ShioriField(
                 icon: "envelope",
                 placeholder: "Email",
                 text: $viewModel.email,
-                keyboard: .emailAddress
+                keyboard: .emailAddress,
+                errorMessage: viewModel.emailErrorMessage
             )
             .textInputAutocapitalization(.never)
             .autocorrectionDisabled()
@@ -199,8 +202,10 @@ struct FirstStepView: View {
                 icon: "lock",
                 placeholder: "Password",
                 text: $viewModel.password,
-                style: .secure
+                style: .secure,
+                errorMessage: viewModel.passwordErrorMessage
             )
+            .textInputAutocapitalization(.never)
             .autocorrectionDisabled()
         }
     }
@@ -278,5 +283,8 @@ struct SubjectsGrid: View {
 }
 
 #Preview {
+    let sessionManager = DependencyFactory.shared.makeSessionManager()
+    
     SignUpView()
+        .environment(sessionManager)
 }

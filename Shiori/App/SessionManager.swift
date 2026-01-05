@@ -8,7 +8,6 @@
 import Foundation
 import Observation
 import Combine
-import FirebaseAuth
 
 @MainActor
 @Observable
@@ -21,30 +20,58 @@ final class SessionManager {
     
     var state: State = .checking
     
-    private var cancellables = Set<AnyCancellable>()
-    private let observeSession: ObserveSessionUseCase
+    private let authRepo: AuthRepositoryProtocol
+    private let userRepo: UserRepositoryProtocol
     
-    init(observeSession: ObserveSessionUseCase) {
-        self.observeSession = observeSession
+    init(authRepo: AuthRepositoryProtocol, userRepo: UserRepositoryProtocol) {
+        self.authRepo = authRepo
+        self.userRepo = userRepo
         self.start()
     }
-
+    
     private func start() {
-        observeSession.execute()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] userProfile in
-                guard let self = self else { return }
-                
-                if let user = userProfile {
-                    if case .authenticated(let currentUser) = self.state, currentUser.id == user.id {
-                        return
-                    }
-                    self.state = .authenticated(user)
+        Task {
+            for await userId in authRepo.authStatePublisher.values {
+                if let userId {
+                    let user = await fetchUserWithRetry(userId: userId)
+                    handleStateUpdate(with: user)
                 } else {
-                    self.state = .unauthenticated
+                    handleStateUpdate(with: nil)
                 }
             }
-            .store(in: &cancellables)
+        }
+    }
+    
+    private func handleStateUpdate(with userProfile: UserProfile?) {
+        if let user = userProfile {
+            if case .authenticated(let currentUser) = self.state, currentUser.id == user.id {
+                return
+            }
+            self.state = .authenticated(user)
+        } else {
+            self.state = .unauthenticated
+        }
+    }
+    
+    private func fetchUserWithRetry(userId: String, maxAttempts: Int = 10) async -> UserProfile? {
+        var attemptsLeft = maxAttempts
+        while attemptsLeft > 0 {
+            do {
+                if let user = try await userRepo.fetchUser(id: userId) {
+                    print("✅ User Profile loaded: \(user.firstName)")
+                    return user
+                } else {
+                    throw URLError(.fileDoesNotExist)
+                }
+            } catch {
+                attemptsLeft -= 1
+                print("⏳ Syncing Profile... (\(attemptsLeft) attempts left)")
+                try? await Task.sleep(for: .seconds(0.5))
+            }
+        }
+        print("❌ CRITICAL: Auth exists for \(userId), but Firestore Profile is missing.")
+        try? authRepo.signOut()
+        return nil
     }
     
     func signIn(with user: UserProfile) {
@@ -52,6 +79,6 @@ final class SessionManager {
     }
     
     func signOut() {
-        try? FirebaseAuth.Auth.auth().signOut()
+        try? authRepo.signOut()
     }
 }

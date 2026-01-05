@@ -38,9 +38,6 @@ struct SignInView: View {
                                 .subTitle()
                         }
                         
-                        ShioriErrorBox(errorMessage: viewModel.errorMessage, type: .error)
-                            .padding(.top)
-                        
                         Spacer()
                         
                         FieldsView(viewModel: viewModel)
@@ -64,11 +61,14 @@ private struct FieldsView: View {
     
     var body: some View {
         VStack(spacing: 15) {
-            ShioriField(icon: "envelope", placeholder: "Email", text: $viewModel.email, keyboard: .emailAddress)
-                .textInputAutocapitalization(.never) 
+            ShioriErrorBox(errorMessage: viewModel.errorMessage, type: .error)
+            
+            ShioriField(icon: "envelope", placeholder: "Email", text: $viewModel.email, keyboard: .emailAddress, errorMessage: viewModel.emailErrorMessage)
+                .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
             
-            ShioriField(icon: "lock", placeholder: "Password", text: $viewModel.password, style: .secure)
+            ShioriField(icon: "lock", placeholder: "Password", text: $viewModel.password, style: .secure, errorMessage: viewModel.passwordErrorMessage)
+                .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
             
             HStack {

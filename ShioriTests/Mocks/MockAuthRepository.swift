@@ -12,11 +12,11 @@ import Combine
 struct MockAuthRepository: AuthRepositoryProtocol {
     var authStatePublisher: AnyPublisher<String?, Never> = Just(nil).eraseToAnyPublisher()
     
-    func signUp(email: String, password: String) async throws -> String {
+    func signUp(_ email: String, _ password: String) async throws -> String {
         return "success"
     }
     
-    func signIn(email: String, password: String) async throws {
+    func signIn(_ email: String, _ password: String) async throws {
         
     }
     

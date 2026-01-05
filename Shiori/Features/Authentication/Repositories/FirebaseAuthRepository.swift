@@ -43,7 +43,7 @@ final class FirebaseAuthRepository: AuthRepositoryProtocol {
         return authStateSubject.eraseToAnyPublisher()
     }
     
-    func signUp(email: String, password: String) async throws -> String {
+    func signUp(_ email: String, _ password: String) async throws -> String {
         do {
             let result = try await Auth.auth().createUser(withEmail: email, password: password)
             return result.user.uid
@@ -52,7 +52,7 @@ final class FirebaseAuthRepository: AuthRepositoryProtocol {
         }
     }
     
-    func signIn(email: String, password: String) async throws {
+    func signIn(_ email: String, _ password: String) async throws {
         do {
             try await Auth.auth().signIn(withEmail: email, password: password)
         } catch {

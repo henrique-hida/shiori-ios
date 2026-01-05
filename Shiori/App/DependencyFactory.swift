@@ -25,24 +25,15 @@ final class DependencyFactory {
     }
     
     func makeSessionManager() -> SessionManager {
-        let useCase = ObserveSessionUseCase(
-            authRepo: authRepo,
-            userRepo: userRepo
-        )
-        return SessionManager(observeSession: useCase)
+        return SessionManager(authRepo: authRepo, userRepo: userRepo)
     }
     
     func makeSignInViewModel() -> SignInViewModel {
-        let useCase = SignInUseCase(authRepo: authRepo)
-        return SignInViewModel(signIn: useCase)
+        return SignInViewModel(authRepo: authRepo)
     }
     
     func makeSignUpViewModel() -> SignUpViewModel {
-        let useCase = SignUpUseCase(
-            authRepo: authRepo,
-            userRepo: userRepo
-        )
-        return SignUpViewModel(signUp: useCase)
+        return SignUpViewModel(authRepo: authRepo, userRepo: userRepo)
     }
     
     func makeHomeViewModel() -> HomeViewModel {

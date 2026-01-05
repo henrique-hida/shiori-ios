@@ -25,7 +25,7 @@ enum AuthError: Error, LocalizedError {
         case .emailAlreadyInUse:
             return "This email address is already in use."
         case .weakPassword:
-            return "The password must be at least 6 characters long."
+            return "The password must be at least 10 characters long."
         case .networkError:
             return "A network error occurred. Please check your connection."
         case .databaseSaveFailed:

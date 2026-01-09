@@ -15,6 +15,9 @@ final class HomeViewModel {
     var isLoading = false
     var errorMessage: String? = nil
     
+    var searchInput: String = ""
+    var isPlayingLastNews: Bool = false
+    
     private let syncService: NewsSyncService
     
     init(syncService: NewsSyncService) {
@@ -39,5 +42,13 @@ final class HomeViewModel {
         }
         
         isLoading = false
+    }
+    
+    func search() {
+        
+    }
+    
+    func handlePlayButtonClick() {
+        isPlayingLastNews.toggle()
     }
 }

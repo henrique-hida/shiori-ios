@@ -22,66 +22,275 @@ struct HomeView: View {
             _viewModel = State(initialValue: vm)
         }
     }
-    
-    private var groupedNews: [(Date, [News])] {
-        let grouped = Dictionary(grouping: viewModel.newsArticles) { article in
-            Calendar.current.startOfDay(for: article.date)
-        }
-        return grouped.sorted { $0.key > $1.key }
-    }
-    
-    private func headerDate(_ date: Date) -> String {
-        if Calendar.current.isDateInToday(date) { return "Today" }
-        if Calendar.current.isDateInYesterday(date) { return "Yesterday" }
-        let formatter = DateFormatter()
-        formatter.dateFormat = "EEEE, MMM d"
-        return formatter.string(from: date)
-    }
         
     var body: some View {
-        VStack {
-            Text("Welcome, \(user.firstName)!")
-                .font(.title)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
+        ZStack {
+            // background
+            Color(Color.backgroundShiori)
+                .ignoresSafeArea()
             
-            if viewModel.isLoading {
-                ProgressView("Syncing News...")
-                    .frame(maxHeight: .infinity)
-            } else if let error = viewModel.errorMessage {
-                Text(error).foregroundStyle(.red)
-            } else {
-                List {
-                    ForEach(groupedNews, id: \.0) { date, articles in
-                        Section(header: Text(headerDate(date))) {
-                            ForEach(articles) { article in
-                                VStack(alignment: .leading, spacing: 5) {
-                                    Text(article.category)
-                                        .font(.caption)
-                                        .fontWeight(.bold)
-                                        .foregroundStyle(.secondary)
-                                    
-                                    Text(article.content)
-                                        .font(.body)
-                                        .lineLimit(3)
-                                }
-                                .padding(.vertical, 4)
+            // content
+            ScrollView {
+                VStack {
+                    if viewModel.isLoading {
+                        ProgressView("Syncing News...")
+                            .frame(maxHeight: .infinity)
+                    } else if let error = viewModel.errorMessage {
+                        ShioriErrorBox(errorMessage: error, type: .error)
+                    } else {
+                        VStack(spacing: 20) {
+                            SearchBar(viewModel: viewModel)
+                            if let latestNews = viewModel.newsArticles.first {
+                                MainCard(viewModel: viewModel, latestNews: latestNews)
+                            } else {
+                                MainCard(viewModel: viewModel, latestNews: nil)
                             }
+                            if viewModel.newsArticles.count > 1 {
+                                let history = Array(viewModel.newsArticles.dropFirst())
+                                CardCarousel(viewModel: viewModel, weekNews: history)
+                            }
+                            NewsStreak(weekNews: viewModel.newsArticles)
+                            ReadLater(laterNews: viewModel.newsArticles)
+                            Dashboard(weekNews: viewModel.newsArticles)
+                            
+                            Spacer()
                         }
                     }
                 }
-                .listStyle(.insetGrouped)
-            }
-        }
-        .onAppear {
-            Task {
-                await viewModel.loadNews(for: user)
+                .padding(25)
+                .onAppear {
+                    Task {
+                        await viewModel.loadNews(for: user)
+                    }
+                }
             }
         }
     }
 }
 
+// MARK: - SubViews
+
+private struct SearchBar: View {
+    @Bindable var viewModel: HomeViewModel
+    
+    var body: some View {
+        HStack {
+            TextField("Paste your news url here", text: $viewModel.searchInput)
+        }
+        .frame(height: 10)
+        .padding()
+        .background(Color(Color.backgroundLightShiori))
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
+        .overlay(alignment: .trailing) {
+            Button(action: {
+                viewModel.search()
+            }, label: {
+                RoundedRectangle(cornerRadius: 20)
+                    .frame(width: 60)
+                    .overlay {
+                        Image(systemName: "magnifyingglass")
+                            .resizable()
+                            .frame(width: 20, height: 20)
+                            .foregroundStyle(Color.textButtonShiori)
+                    }
+            })
+        }
+    }
+}
+
+private struct MainCard: View {
+    @Bindable var viewModel: HomeViewModel
+    var latestNews: News?
+    var latestNewsDate: String {
+        latestNews?.date.formatted(.dateTime.day().month()) ?? "--/--"
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            VStack(alignment: .leading) {
+                Text("Last news")
+                    .foregroundStyle(Color.accentSecondaryShiori)
+                    .textSmall()
+                
+                Text(latestNewsDate)
+                    .foregroundStyle(Color.textButtonShiori)
+                    .newsDate()
+            }
+            Button {
+                viewModel.handlePlayButtonClick()
+            } label: {
+                Circle()
+                    .overlay(
+                        Image(systemName: viewModel.isPlayingLastNews ? "pause.fill" : "play.fill")
+                            .foregroundStyle(Color.accent)
+                    )
+                    .foregroundStyle(Color.accentButton)
+            }
+
+        }
+        .padding(20)
+        .frame(height: 140, alignment: .top)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.accent)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
+    }
+}
+
+private struct CardCarousel: View {
+    var viewModel: HomeViewModel
+    var weekNews: [News]
+    
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 15) {
+                ForEach(weekNews) { news in
+                    VStack(alignment: .leading) {
+                        VStack(alignment: .leading) {
+                            Text(news.date.formatted(.dateTime.weekday(.abbreviated)))
+                                .foregroundStyle(Color.textMuted)
+                                .textSmall()
+                            
+                            Text(news.date.formatted(.dateTime.day().month()))
+                                .textLarge()
+                        }
+                    }
+                    .padding(20)
+                    .frame(width: 100, height: 120, alignment: .topLeading)
+                    .background(Color.backgroundLightShiori)
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
+                }
+            }
+            .padding(.bottom, 5)
+        }
+    }
+}
+
+private struct NewsStreak: View {
+    var weekNews: [News]
+    
+    var body: some View {
+        VStack(spacing: 15) {
+            Text("News Streak")
+                .bold()
+                .subTitle()
+            
+            HStack(spacing: 10) {
+                ForEach(weekNews) { news in
+                    VStack(spacing: 10) {
+                        Image(systemName: news.wasRead ? "flame.fill" : "flame")
+                            .font(.system(size: 35))
+                            .foregroundStyle(Color.accent)
+                        
+                        Text(news.date.formatted(.dateTime.weekday(.narrow)))
+                    }
+                }
+            }
+            .frame(height: 85)
+            .frame(maxWidth: .infinity)
+            .padding(20)
+            .background(Color.bgLight)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
+        }
+        
+    }
+}
+
+private struct ReadLater: View {
+    var laterNews: [News]
+    
+    var body: some View {
+        VStack(spacing: 15) {
+            Text("Later News")
+                .bold()
+                .subTitle()
+            
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 10) {
+                    ForEach(laterNews) { news in
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text(news.content)
+                                    .textLarge()
+                                Text(news.id)
+                                    .textSmall()
+                            }
+                            
+                            VStack {
+                                Text(news.date.formatted(.dateTime.day().month(.omitted)))
+                                    .foregroundStyle(Color.text)
+                                    .bold()
+                                    .subTitle()
+                                
+                                Text(news.date.formatted(.dateTime.month(.abbreviated)))
+                                    .bold()
+                            }
+                            .padding(.leading, 50)
+                        }
+                        .frame(height: 30)
+                        .frame(maxWidth: .infinity)
+                        .padding(20)
+                        .background(Color.bgLight)
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                        .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
+                    }
+                }
+            }
+            .frame(height: 235)
+            
+            HStack {
+                Text("See all")
+                    .foregroundStyle(Color.accent)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                
+                Image(systemName: "arrow.forward")
+                    .foregroundStyle(Color.accent)
+            }
+                
+        }
+        
+    }
+}
+
+private struct Dashboard: View {
+    var weekNews: [News]
+    
+    var body: some View {
+        VStack(spacing: 15) {
+            Text("Most read subjects")
+                .bold()
+                .subTitle()
+            
+            HStack(spacing: 10) {
+                VStack {
+                    Text("40%")
+                        .title()
+                    
+                    Text("Economy")
+                        .foregroundStyle(Color.accent)
+                        .subTitle()
+                }
+                
+                
+                
+            }
+            .frame(height: 150)
+            .frame(maxWidth: .infinity)
+            .padding(20)
+            .background(Color.bgLight)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
+        }
+        
+    }
+}
+
 #Preview {
+    let sessionManager = DependencyFactory.shared.makeSessionManager()
+    
     let schema = Schema([NewsData.self])
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     let container = try! ModelContainer(for: schema, configurations: config)
@@ -95,7 +304,7 @@ struct HomeView: View {
             content: "This is a summary of news from \(i) days ago. It shows how the app handles history.",
             date: date,
             tone: "formal",
-            wasRead: i > 0
+            wasRead: i % 2 == 0
         )
         container.mainContext.insert(newsData)
     }
@@ -127,4 +336,5 @@ struct HomeView: View {
     
     return HomeView(user: user, viewModel: viewModel)
         .modelContainer(container)
+        .environment(sessionManager)
 }

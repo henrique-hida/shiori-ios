@@ -10,7 +10,7 @@ import Observation
 
 @MainActor
 @Observable
-class SignInViewModel {
+final class SignInViewModel {
     var email: String = ""
     var password: String = ""
     

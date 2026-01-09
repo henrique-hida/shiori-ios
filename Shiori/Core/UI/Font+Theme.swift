@@ -63,6 +63,11 @@ extension View {
             .foregroundStyle(Color.textPrimaryShiori)
     }
     
+    func newsDate() -> some View {
+        self.appFont(24, weight: .bold)
+            .foregroundStyle(Color.textButtonShiori)
+    }
+    
     func title() -> some View {
         self.appFont(48, weight: .bold)
             .foregroundStyle(Color.accentPrimaryShiori)

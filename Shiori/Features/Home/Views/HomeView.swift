@@ -22,7 +22,7 @@ struct HomeView: View {
             _viewModel = State(initialValue: vm)
         }
     }
-        
+    
     var body: some View {
         ZStack {
             // background
@@ -65,6 +65,25 @@ struct HomeView: View {
                 }
             }
         }
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Image("Isologo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 80)
+                    .foregroundStyle(Color.textMuted)
+            }
+            
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: {
+                    print("Menu tapped")
+                }) {
+                    Image(systemName: "line.3.horizontal")
+                        .foregroundStyle(.primary)
+                }
+            }
+        }
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
@@ -127,7 +146,7 @@ private struct MainCard: View {
                     )
                     .foregroundStyle(Color.accentButton)
             }
-
+            
         }
         .padding(20)
         .frame(height: 140, alignment: .top)
@@ -201,6 +220,9 @@ private struct NewsStreak: View {
 
 private struct ReadLater: View {
     var laterNews: [News]
+    var lastLaterNews: [News] {
+        Array(laterNews.suffix(3))
+    }
     
     var body: some View {
         VStack(spacing: 15) {
@@ -208,38 +230,35 @@ private struct ReadLater: View {
                 .bold()
                 .subTitle()
             
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: 10) {
-                    ForEach(laterNews) { news in
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text(news.content)
-                                    .textLarge()
-                                Text(news.id)
-                                    .textSmall()
-                            }
-                            
-                            VStack {
-                                Text(news.date.formatted(.dateTime.day().month(.omitted)))
-                                    .foregroundStyle(Color.text)
-                                    .bold()
-                                    .subTitle()
-                                
-                                Text(news.date.formatted(.dateTime.month(.abbreviated)))
-                                    .bold()
-                            }
-                            .padding(.leading, 50)
+            VStack(spacing: 10) {
+                ForEach(lastLaterNews) { news in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(news.content)
+                                .textLarge()
+                            Text(news.id)
+                                .textSmall()
                         }
-                        .frame(height: 30)
-                        .frame(maxWidth: .infinity)
-                        .padding(20)
-                        .background(Color.bgLight)
-                        .clipShape(RoundedRectangle(cornerRadius: 20))
-                        .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
+                        
+                        VStack {
+                            Text(news.date.formatted(.dateTime.day().month(.omitted)))
+                                .foregroundStyle(Color.text)
+                                .bold()
+                                .subTitle()
+                            
+                            Text(news.date.formatted(.dateTime.month(.abbreviated)))
+                                .bold()
+                        }
+                        .padding(.leading, 50)
                     }
+                    .frame(height: 30)
+                    .frame(maxWidth: .infinity)
+                    .padding(20)
+                    .background(Color.bgLight)
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
                 }
             }
-            .frame(height: 235)
             
             HStack {
                 Text("See all")
@@ -249,7 +268,7 @@ private struct ReadLater: View {
                 Image(systemName: "arrow.forward")
                     .foregroundStyle(Color.accent)
             }
-                
+            
         }
         
     }
@@ -265,19 +284,82 @@ private struct Dashboard: View {
                 .subTitle()
             
             HStack(spacing: 10) {
-                VStack {
+                Spacer()
+                VStack(alignment: .center) {
                     Text("40%")
                         .title()
                     
                     Text("Economy")
                         .foregroundStyle(Color.accent)
+                        .bold()
                         .subTitle()
                 }
+                Spacer()
                 
+                VStack(spacing: 15) {
+                    VStack(spacing: 3) {
+                        HStack {
+                            Text("Politics")
+                                .textSmall()
+                            Spacer()
+                            Text("30%")
+                                .textSmall()
+                        }
+                        ZStack(alignment: .leading) {
+                            Capsule()
+                                .foregroundStyle(Color.bg)
+                                .frame(height: 10)
+                                .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
+                            
+                            Capsule()
+                                .foregroundStyle(Color.accent)
+                                .frame(width: 150*0.3, height: 10)
+                        }
+                    }
+                    VStack(spacing: 3) {
+                        HStack {
+                            Text("Politics")
+                                .textSmall()
+                            Spacer()
+                            Text("20%")
+                                .textSmall()
+                        }
+                        ZStack(alignment: .leading) {
+                            Capsule()
+                                .foregroundStyle(Color.bg)
+                                .frame(height: 10)
+                                .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
+                            
+                            Capsule()
+                                .foregroundStyle(Color.accent)
+                                .frame(width: 150*0.2, height: 10)
+                        }
+                    }
+                    VStack(spacing: 3) {
+                        HStack {
+                            Text("Politics")
+                                .textSmall()
+                            Spacer()
+                            Text("10%")
+                                .textSmall()
+                        }
+                        ZStack(alignment: .leading) {
+                            Capsule()
+                                .foregroundStyle(Color.bg)
+                                .frame(height: 10)
+                                .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
+                            
+                            Capsule()
+                                .foregroundStyle(Color.accent)
+                                .frame(width: 150*0.1, height: 10)
+                        }
+                    }
+                }
+                .frame(width: 150)
                 
+                Spacer()
                 
             }
-            .frame(height: 150)
             .frame(maxWidth: .infinity)
             .padding(20)
             .background(Color.bgLight)
@@ -334,7 +416,9 @@ private struct Dashboard: View {
         newsPreferences: dummyPrefs
     )
     
-    return HomeView(user: user, viewModel: viewModel)
-        .modelContainer(container)
-        .environment(sessionManager)
+    return NavigationStack {
+        HomeView(user: user, viewModel: viewModel)
+            .modelContainer(container)
+            .environment(sessionManager)
+    }
 }

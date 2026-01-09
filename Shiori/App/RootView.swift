@@ -20,7 +20,9 @@ struct RootView: View {
                     StartingView()
                 }
             case .authenticated(let userProfile):
-                HomeView(user: userProfile)
+                NavigationStack {
+                    HomeView(user: userProfile)
+                }
             }
         }
         .animation(.easeInOut, value: sessionManager.state)

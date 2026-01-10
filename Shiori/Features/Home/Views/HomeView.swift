@@ -52,8 +52,6 @@ struct HomeView: View {
                             NewsStreak(weekNews: viewModel.newsArticles)
                             ReadLater(laterNews: viewModel.newsArticles)
                             Dashboard(weekNews: viewModel.newsArticles)
-                            
-                            Spacer()
                         }
                     }
                 }

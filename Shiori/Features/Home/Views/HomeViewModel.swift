@@ -19,9 +19,11 @@ final class HomeViewModel {
     var isPlayingLastNews: Bool = false
     
     private let syncService: NewsSyncService
+    private let linkSummaryRepository: LinkSummaryRepositoryProtocol
     
-    init(syncService: NewsSyncService) {
+    init(syncService: NewsSyncService, linkSummaryRepository: LinkSummaryRepositoryProtocol) {
         self.syncService = syncService
+        self.linkSummaryRepository = linkSummaryRepository
     }
     
     func loadNews(for user: UserProfile) async {

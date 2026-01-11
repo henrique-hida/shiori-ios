@@ -38,7 +38,8 @@ final class DependencyFactory {
     
     func makeHomeViewModel() -> HomeViewModel {
         let service = makeNewsSyncService()
-        return HomeViewModel(syncService: service)
+        let linkSummaryRepo = GeminiLinkSummaryRepository(apiKey: Bundle.main.geminiApiKey)
+        return HomeViewModel(syncService: service, linkSummaryRepository: linkSummaryRepo)
     }
     
     func makeNewsSyncService() -> NewsSyncService {
@@ -47,5 +48,11 @@ final class DependencyFactory {
             localRepo: localNewsRepo,
             cloudRepo: cloudRepo
         )
+    }
+}
+
+extension Bundle {
+    var geminiApiKey: String {
+        return object(forInfoDictionaryKey: "GeminiAPIKey") as? String ?? ""
     }
 }

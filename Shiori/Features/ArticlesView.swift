@@ -26,11 +26,6 @@ struct ArticlesView: View {
             AudioPlayer()
         }
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Image(systemName: "arrow.left")
-                    .foregroundStyle(Color.textMuted)
-            }
-            
             ToolbarItem(placement: .principal) {
                 Text(summary.createdAt.formatted(.dateTime.day().month().year()))
                     .bold()

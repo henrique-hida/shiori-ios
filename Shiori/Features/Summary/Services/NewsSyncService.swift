@@ -9,7 +9,7 @@ import Foundation
 import UserNotifications
 
 @MainActor
-final class NewsSyncService {
+final class NewsSyncService: NewsSyncServiceProtocol {
     private let localRepo: LocalNewsRepositoryProtocol
     private let cloudRepo: CloudNewsRepositoryProtocol
     

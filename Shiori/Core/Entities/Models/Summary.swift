@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Summary: Identifiable, Codable, Sendable {
+struct Summary: Identifiable, Codable, Sendable, Hashable {
     let id: String
     let title: String
     let content: String

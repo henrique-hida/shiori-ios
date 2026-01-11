@@ -9,11 +9,10 @@ import Foundation
 
 class GeminiLinkSummaryRepository: LinkSummaryRepositoryProtocol {
     private let apiKey: String
-    private let modelName: String
+    private let modelName: String = "gemini-2.5-flash"
     
-    init(apiKey: String, modelName: String = "gemini-2.5-flash") {
+    init(apiKey: String) {
         self.apiKey = apiKey
-        self.modelName = modelName
     }
     
     

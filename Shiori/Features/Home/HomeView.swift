@@ -63,6 +63,9 @@ struct HomeView: View {
                 }
             }
         }
+        .navigationDestination(item: $viewModel.selectedSummary) { article in
+            ArticlesView(summary: article)
+        }
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Image("Isologo")
@@ -101,7 +104,9 @@ private struct SearchBar: View {
         .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
         .overlay(alignment: .trailing) {
             Button(action: {
-                viewModel.search()
+                Task {
+                    await viewModel.search()
+                }
             }, label: {
                 RoundedRectangle(cornerRadius: 20)
                     .frame(width: 60)
@@ -152,6 +157,11 @@ private struct MainCard: View {
         .background(Color.accent)
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
+        .onTapGesture {
+            if let summary = latestNews {
+                viewModel.navigateToSummary(summary)
+            }
+        }
     }
 }
 
@@ -178,6 +188,9 @@ private struct CardCarousel: View {
                     .background(Color.backgroundLightShiori)
                     .clipShape(RoundedRectangle(cornerRadius: 20))
                     .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
+                    .onTapGesture {
+                        viewModel.navigateToSummary(news)
+                    }
                 }
             }
             .padding(.bottom, 5)
@@ -398,7 +411,8 @@ func makePreviewDependencies() -> (ModelContainer, HomeViewModel, UserProfile, S
     let localRepo = LocalNewsRepository(context: container.mainContext)
     let cloudRepo = MockNewsDatabaseRepository()
     let syncService = NewsSyncService(localRepo: localRepo, cloudRepo: cloudRepo)
-    let viewModel = HomeViewModel(syncService: syncService)
+    let linkSummaryRepo = GeminiLinkSummaryRepository(apiKey: "")
+    let viewModel = HomeViewModel(syncService: syncService, linkSummaryRepository: linkSummaryRepo)
     
     let dummyPrefs = NewsSummaryPreferences(
         duration: .fast,

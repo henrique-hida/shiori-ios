@@ -15,6 +15,8 @@ final class DependencyFactory {
     private let authRepo: AuthRepositoryProtocol
     private let userRepo: UserRepositoryProtocol
     private let localNewsRepo: LocalNewsRepositoryProtocol
+    private let historyRepo: ReadingHistoryRepositoryProtocol
+    private let readLaterRepo: ReadLaterRepositoryProtocol
     
     private init() {
         let dbContext = DatabaseProvider.shared.container.mainContext
@@ -22,6 +24,8 @@ final class DependencyFactory {
         self.authRepo = FirebaseAuthRepository()
         self.userRepo = FirestoreUserRepository()
         self.localNewsRepo = LocalNewsRepository(context: dbContext)
+        self.historyRepo = ReadingHistoryRepository(modelContext: dbContext)
+        self.readLaterRepo = ReadLaterRepository(modelContext: dbContext)
     }
     
     func makeSessionManager() -> SessionManager {
@@ -39,7 +43,12 @@ final class DependencyFactory {
     func makeHomeViewModel() -> HomeViewModel {
         let service = makeNewsSyncService()
         let linkSummaryRepo = GeminiLinkSummaryRepository(apiKey: Bundle.main.geminiApiKey)
-        return HomeViewModel(syncService: service, linkSummaryRepository: linkSummaryRepo)
+        return HomeViewModel(
+            syncService: service,
+            linkSummaryRepo: linkSummaryRepo,
+            historyRepo: historyRepo,
+            readLaterRepo: readLaterRepo
+        )
     }
     
     func makeNewsSyncService() -> NewsSyncService {

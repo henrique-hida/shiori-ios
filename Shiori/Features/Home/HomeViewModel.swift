@@ -23,12 +23,27 @@ final class HomeViewModel {
     var shouldShowLinkSummarySettings: Bool = false
     var isPlayingLastNews: Bool = false
     
+    var currentWeekStreak: [String: Bool] = [:]
+    var currentWeekDates: [Date] = []
+    
+    var readLaterSummaries: [ReadLater] = []
+    
     private let syncService: NewsSyncServiceProtocol
     private let linkSummaryRepo: LinkSummaryRepositoryProtocol
+    private let historyRepo: ReadingHistoryRepositoryProtocol
+    private let readLaterRepo: ReadLaterRepositoryProtocol
     
-    init(syncService: NewsSyncServiceProtocol, linkSummaryRepository: LinkSummaryRepositoryProtocol) {
+    init(
+        syncService: NewsSyncServiceProtocol,
+        linkSummaryRepo: LinkSummaryRepositoryProtocol,
+        historyRepo: ReadingHistoryRepositoryProtocol,
+        readLaterRepo: ReadLaterRepositoryProtocol
+    ){
         self.syncService = syncService
-        self.linkSummaryRepo = linkSummaryRepository
+        self.linkSummaryRepo = linkSummaryRepo
+        self.historyRepo = historyRepo
+        self.readLaterRepo = readLaterRepo
+        self.generateCurrentWeek()
     }
     
     func loadNews(for user: UserProfile) async {
@@ -94,5 +109,74 @@ final class HomeViewModel {
     
     func handlePlayButtonClick() {
         isPlayingLastNews.toggle()
+    }
+    
+    func generateCurrentWeek() {
+        let calendar = Calendar.current
+        let today = Date()
+        guard let monday = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: today)) else { return }
+        
+        self.currentWeekDates = (0..<7).compactMap { dayOffset in
+            calendar.date(byAdding: .day, value: dayOffset, to: monday)
+        }
+    }
+
+    func loadStreak() async {
+        do {
+            let activeDays = try await historyRepo.getHistory(for: currentWeekDates)
+            var newStreakMap: [String: Bool] = [:]
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd"
+            
+            for date in currentWeekDates {
+                let key = formatter.string(from: date)
+                newStreakMap[key] = activeDays.contains(key)
+            }
+            
+            self.currentWeekStreak = newStreakMap
+        } catch {
+            print("Failed to load streak: \(error)")
+        }
+    }
+
+    func trackReadAction(user: UserProfile) {
+        Task {
+            try? await historyRepo.markTodayAsRead(user: user)
+            await loadStreak()
+        }
+    }
+    
+    func getDateKey(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: date)
+    }
+    
+    func isFuture(_ date: Date) -> Bool {
+        Calendar.current.startOfDay(for: date) > Calendar.current.startOfDay(for: Date())
+    }
+    
+    func isToday(_ date: Date) -> Bool {
+        Calendar.current.isDateInToday(date)
+    }
+    
+    func loadReadLater() async {
+        let summaries = await readLaterRepo.getAll()
+        self.readLaterSummaries = summaries
+    }
+
+    func toggleReadLater(_ summary: Summary, user: UserProfile) {
+        Task {
+            if isReadLater(summary.id) {
+                await readLaterRepo.remove(id: summary.id, user: user)
+            } else {
+                await readLaterRepo.save(summary, user: user)
+            }
+            await loadReadLater()
+        }
+    }
+
+    func isReadLater(_ id: String) -> Bool {
+        return readLaterSummaries.contains(where: { $0.id == id })
     }
 }

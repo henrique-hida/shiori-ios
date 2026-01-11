@@ -35,10 +35,11 @@ struct HomeView: View {
                     if viewModel.isLoading {
                         ProgressView("Syncing News...")
                             .frame(maxHeight: .infinity)
-                    } else if let error = viewModel.errorMessage {
-                        ShioriErrorBox(errorMessage: error, type: .error)
                     } else {
                         VStack(spacing: 20) {
+                            if let error = viewModel.errorMessage {
+                                ShioriErrorBox(errorMessage: error, type: .error)
+                            }
                             SearchBar(viewModel: viewModel)
                             if let latestNews = viewModel.weekNewsSummaries.first {
                                 MainCard(viewModel: viewModel, latestNews: latestNews)
@@ -85,6 +86,10 @@ struct HomeView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $viewModel.shouldShowLinkSummarySettings) {
+            LinkSummarySettings(viewModel: viewModel)
+                .presentationDetents([.height(400)])
+        }
     }
 }
 
@@ -96,6 +101,9 @@ private struct SearchBar: View {
     var body: some View {
         HStack {
             TextField("Paste your news url here", text: $viewModel.searchInput)
+                .autocorrectionDisabled()
+                .autocapitalization(.none)
+                .keyboardType(.URL)
         }
         .frame(height: 10)
         .padding()
@@ -104,8 +112,8 @@ private struct SearchBar: View {
         .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
         .overlay(alignment: .trailing) {
             Button(action: {
-                Task {
-                    await viewModel.search()
+                if viewModel.isValidUrl(viewModel.searchInput) {
+                    viewModel.shouldShowLinkSummarySettings = true
                 }
             }, label: {
                 RoundedRectangle(cornerRadius: 20)
@@ -382,6 +390,44 @@ private struct Dashboard: View {
             .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
         }
         
+    }
+}
+
+private struct LinkSummarySettings: View {
+    @Environment(\.dismiss) private var dismiss
+    @Bindable var viewModel: HomeViewModel
+    
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 20) {
+                VStack(spacing: 15) {
+                    ShioriSelector(title: "Select a style", icon: "newspaper", options: SummaryStyle.allCases, selection: $viewModel.linkSummaryStyle)
+                    
+                    ShioriSelector(title: "Select a duration", icon: "clock", options: SummaryDuration.allCases, selection: $viewModel.linkSummaryDuration)
+                    
+                }
+                ShioriButton(title: "Generate summary", style: .primary) {
+                    Task {
+                        if let url = viewModel.validUrl {
+                            await viewModel.search(url: url)
+                        }
+                    }
+                }
+            }
+            .padding(20)
+            .padding(.top, 0)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                    }
+                }
+            }
+            .navigationTitle("Custom your summary")
+            .navigationBarTitleDisplayMode(.inline)
+        }
     }
 }
 

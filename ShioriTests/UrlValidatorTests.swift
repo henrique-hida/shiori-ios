@@ -15,8 +15,8 @@ struct URLValidationTests {
     func testValidURLs() throws {
         let vm = makeTestViewModel()
         
-        #expect(throws: Never.self) { try vm.verifyUrl("https://apple.com") }
-        #expect(throws: Never.self) { try vm.verifyUrl("http://bbc.co.uk/news") }
+        #expect(vm.isValidUrl("https://apple.com") == true)
+        #expect(vm.isValidUrl("http://bbc.co.uk/news") == true)
     }
 
     @Test("Invalid URLs test", arguments: [
@@ -28,10 +28,7 @@ struct URLValidationTests {
     ])
     func testInvalidURLs(invalidString: String) throws {
         let vm = makeTestViewModel()
-        
-        #expect(throws: HomeViewModel.ValidationError.invalidFormat) {
-            try vm.verifyUrl(invalidString)
-        }
+        #expect(vm.isValidUrl(invalidString) == false)
     }
     
     private func makeTestViewModel() -> HomeViewModel {

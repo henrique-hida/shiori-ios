@@ -17,8 +17,10 @@ final class HomeViewModel {
     
     var selectedSummary: Summary? = nil
     var searchInput: String = ""
-    var linkSummaryStyle: SummaryStyle? = nil
-    var linkSummaryDuration: SummaryDuration? = nil
+    var validUrl: URL? = nil
+    var linkSummaryStyle: SummaryStyle = .informal
+    var linkSummaryDuration: SummaryDuration = .standard
+    var shouldShowLinkSummarySettings: Bool = false
     var isPlayingLastNews: Bool = false
     
     private let syncService: NewsSyncServiceProtocol
@@ -49,22 +51,16 @@ final class HomeViewModel {
         isLoading = false
     }
     
-    func search() async {
-        guard !searchInput.isEmpty else { return }
-        guard let style = linkSummaryStyle else { return }
-        guard let duration = linkSummaryDuration else { return }
-        
+    func search(url: URL) async {
         isLoading = true
         errorMessage = nil
         
         do {
-            let validatedURL = try verifyUrl(searchInput)
-            let summary = try await linkSummaryRepo.summarizeLink(url: validatedURL, style: style, duration: duration)
+            let summary = try await linkSummaryRepo.summarizeLink(url: url, style: linkSummaryStyle, duration: linkSummaryDuration)
             self.weekNewsSummaries.insert(summary, at: 0)
             self.searchInput = ""
+            self.validUrl = nil
             navigateToSummary(summary)
-        } catch ValidationError.invalidFormat {
-            self.errorMessage = "Please enter a valid web address (e.g., https://news.com)."
         } catch {
             print("❌ Search Error: \(error)")
             self.errorMessage = "We couldn't summarize this link. Please try another one."
@@ -74,15 +70,18 @@ final class HomeViewModel {
     }
     
     @discardableResult
-    func verifyUrl(_ urlString: String) throws -> URL {
+    func isValidUrl(_ urlString: String) -> Bool {
         let trimmed = urlString.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let url = URL(string: trimmed),
               let scheme = url.scheme,
               ["http", "https"].contains(scheme.lowercased()),
-              url.host != nil else {
-            throw ValidationError.invalidFormat
+              url.host != nil
+        else {
+            self.errorMessage = "Please enter a valid web address (e.g., https://news.com)."
+            return false
         }
-        return url
+        validUrl = url
+        return true
     }
     
     func navigateToSummary(_ summary: Summary) {

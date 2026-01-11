@@ -108,14 +108,14 @@ let validator = CredentialsValidator()
 
 @Suite struct NewsSubjectValidatorTests {
     @Test("Valid news subjects test") func testValidNewsSubjects() throws {
-        let validNewsSubjects: [Set<NewsSubject>] = [[NewsSubject.economyAndBusiness, NewsSubject.entertainmentAndCulture, NewsSubject.healthAndScience], [NewsSubject.politic]]
+        let validNewsSubjects: [Set<SummarySubject>] = [[SummarySubject.economyAndBusiness, SummarySubject.entertainmentAndCulture, SummarySubject.healthAndScience], [SummarySubject.politic]]
         for newsSubjects in validNewsSubjects {
             try validator.isValidNewsSubjects(newsSubjects)
         }
     }
     
     @Test("Invalid news subjects test") func testInvalidNewsSubjects() throws {
-        let invalidNewsSubjects: Set<NewsSubject> = []
+        let invalidNewsSubjects: Set<SummarySubject> = []
         #expect(throws: ValidationError.emptyField("news subjects")) {
             try validator.isValidNewsSubjects(invalidNewsSubjects)
         }

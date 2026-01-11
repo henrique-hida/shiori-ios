@@ -19,9 +19,9 @@ final class SignUpViewModel {
     
     var selectedLanguage: Language = Language.currentSystemLanguage
     var selectedTheme: Theme = .system
-    var selectedDuration: NewsDuration = .standard
-    var selectedStyle: NewsStyle = .informal
-    var selectedSubjects: Set<NewsSubject> = []
+    var selectedDuration: SummaryDuration = .standard
+    var selectedStyle: SummaryStyle = .informal
+    var selectedSubjects: Set<SummarySubject> = []
     var selectedArriveTime: Int = 6
     
     var signUpStep = 1
@@ -107,8 +107,7 @@ final class SignUpViewModel {
             isPremium: false,
             language: selectedLanguage,
             theme: .system,
-            weekStreak: [],
-            newsPreferences: NewsPreferences(
+            newsPreferences: NewsSummaryPreferences(
                 duration: selectedDuration,
                 style: selectedStyle,
                 subjects: Array(selectedSubjects),

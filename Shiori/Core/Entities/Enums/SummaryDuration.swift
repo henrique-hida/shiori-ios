@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum NewsDuration: String, Codable, CaseIterable {
+enum SummaryDuration: String, Codable, CaseIterable {
     case fast = "fast"
     case standard = "standard"
     case deep = "deep"

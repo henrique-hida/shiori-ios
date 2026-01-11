@@ -40,18 +40,18 @@ struct HomeView: View {
                     } else {
                         VStack(spacing: 20) {
                             SearchBar(viewModel: viewModel)
-                            if let latestNews = viewModel.newsArticles.first {
+                            if let latestNews = viewModel.weekNewsSummaries.first {
                                 MainCard(viewModel: viewModel, latestNews: latestNews)
                             } else {
                                 MainCard(viewModel: viewModel, latestNews: nil)
                             }
-                            if viewModel.newsArticles.count > 1 {
-                                let history = Array(viewModel.newsArticles.dropFirst())
+                            if viewModel.weekNewsSummaries.count > 1 {
+                                let history = Array(viewModel.weekNewsSummaries.dropFirst())
                                 CardCarousel(viewModel: viewModel, weekNews: history)
                             }
-                            NewsStreak(weekNews: viewModel.newsArticles)
-                            ReadLater(laterNews: viewModel.newsArticles)
-                            Dashboard(weekNews: viewModel.newsArticles)
+                            NewsStreak(weekNews: viewModel.weekNewsSummaries)
+                            ReadLater(laterNews: viewModel.weekNewsSummaries)
+                            Dashboard(weekNews: viewModel.weekNewsSummaries)
                         }
                     }
                 }
@@ -118,9 +118,9 @@ private struct SearchBar: View {
 
 private struct MainCard: View {
     @Bindable var viewModel: HomeViewModel
-    var latestNews: News?
+    var latestNews: Summary?
     var latestNewsDate: String {
-        latestNews?.date.formatted(.dateTime.day().month()) ?? "--/--"
+        latestNews?.createdAt.formatted(.dateTime.day().month()) ?? "--/--"
     }
     
     var body: some View {
@@ -157,7 +157,7 @@ private struct MainCard: View {
 
 private struct CardCarousel: View {
     var viewModel: HomeViewModel
-    var weekNews: [News]
+    var weekNews: [Summary]
     
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -165,11 +165,11 @@ private struct CardCarousel: View {
                 ForEach(weekNews) { news in
                     VStack(alignment: .leading) {
                         VStack(alignment: .leading) {
-                            Text(news.date.formatted(.dateTime.weekday(.abbreviated)))
+                            Text(news.createdAt.formatted(.dateTime.weekday(.abbreviated)))
                                 .foregroundStyle(Color.textMuted)
                                 .textSmall()
                             
-                            Text(news.date.formatted(.dateTime.day().month()))
+                            Text(news.createdAt.formatted(.dateTime.day().month()))
                                 .textLarge()
                         }
                     }
@@ -186,7 +186,7 @@ private struct CardCarousel: View {
 }
 
 private struct NewsStreak: View {
-    var weekNews: [News]
+    var weekNews: [Summary]
     
     var body: some View {
         VStack(spacing: 15) {
@@ -197,11 +197,11 @@ private struct NewsStreak: View {
             HStack(spacing: 10) {
                 ForEach(weekNews) { news in
                     VStack(spacing: 10) {
-                        Image(systemName: news.wasRead ? "flame.fill" : "flame")
+                        Image(systemName: "flame.fill")
                             .font(.system(size: 35))
                             .foregroundStyle(Color.accent)
                         
-                        Text(news.date.formatted(.dateTime.weekday(.narrow)))
+                        Text(news.createdAt.formatted(.dateTime.weekday(.narrow)))
                     }
                 }
             }
@@ -217,8 +217,8 @@ private struct NewsStreak: View {
 }
 
 private struct ReadLater: View {
-    var laterNews: [News]
-    var lastLaterNews: [News] {
+    var laterNews: [Summary]
+    var lastThreeLaterNews: [Summary] {
         Array(laterNews.suffix(3))
     }
     
@@ -229,27 +229,31 @@ private struct ReadLater: View {
                 .subTitle()
             
             VStack(spacing: 10) {
-                ForEach(lastLaterNews) { news in
+                ForEach(lastThreeLaterNews) { news in
                     HStack {
                         VStack(alignment: .leading) {
-                            Text(news.content)
+                            Text(news.title)
                                 .textLarge()
+                                .lineLimit(1)
                             Text(news.id)
                                 .textSmall()
+                                .lineLimit(1)
                         }
                         
+                        Spacer()
+                        
                         VStack {
-                            Text(news.date.formatted(.dateTime.day().month(.omitted)))
+                            Text(news.createdAt.formatted(.dateTime.day().month(.omitted)))
                                 .foregroundStyle(Color.text)
                                 .bold()
                                 .subTitle()
                             
-                            Text(news.date.formatted(.dateTime.month(.abbreviated)))
+                            Text(news.createdAt.formatted(.dateTime.month(.abbreviated)))
                                 .bold()
                         }
-                        .padding(.leading, 50)
+                        .padding(.leading, 10)
                     }
-                    .frame(height: 30)
+                    .frame(height: 50)
                     .frame(maxWidth: .infinity)
                     .padding(20)
                     .background(Color.bgLight)
@@ -273,7 +277,7 @@ private struct ReadLater: View {
 }
 
 private struct Dashboard: View {
-    var weekNews: [News]
+    var weekNews: [Summary]
     
     var body: some View {
         VStack(spacing: 15) {
@@ -368,35 +372,35 @@ private struct Dashboard: View {
     }
 }
 
-#Preview {
+@MainActor
+func makePreviewDependencies() -> (ModelContainer, HomeViewModel, UserProfile, SessionManager) {
     let sessionManager = DependencyFactory.shared.makeSessionManager()
-    
-    let schema = Schema([NewsData.self])
+    let schema = Schema([SummaryData.self])
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     let container = try! ModelContainer(for: schema, configurations: config)
     let today = Date()
+    
     for i in 0..<7 {
         let date = Calendar.current.date(byAdding: .day, value: -i, to: today)!
-        
-        let newsData = NewsData(
+        let newsData = SummaryData(
             id: "preview-news-\(i)",
-            category: i % 2 == 0 ? "Technology" : "Science",
-            content: "This is a summary of news from \(i) days ago. It shows how the app handles history.",
-            date: date,
-            tone: "formal",
-            wasRead: i % 2 == 0
+            title: "Daily Briefing \(i)",
+            content: "This is a summary of news from \(i) days ago.",
+            createdAt: date,
+            thumbUrl: "",
+            sources: [],
+            subjects: i % 2 == 0 ? [.technology] : [.healthAndScience],
+            type: .news
         )
         container.mainContext.insert(newsData)
     }
-    
-    try? container.mainContext.save()
     
     let localRepo = LocalNewsRepository(context: container.mainContext)
     let cloudRepo = MockNewsDatabaseRepository()
     let syncService = NewsSyncService(localRepo: localRepo, cloudRepo: cloudRepo)
     let viewModel = HomeViewModel(syncService: syncService)
     
-    let dummyPrefs = NewsPreferences(
+    let dummyPrefs = NewsSummaryPreferences(
         duration: .fast,
         style: .informal,
         subjects: [.technology],
@@ -410,11 +414,16 @@ private struct Dashboard: View {
         isPremium: true,
         language: .english,
         theme: .system,
-        weekStreak: [],
         newsPreferences: dummyPrefs
     )
     
-    return NavigationStack {
+    return (container, viewModel, user, sessionManager)
+}
+
+#Preview {
+    let (container, viewModel, user, sessionManager) = makePreviewDependencies()
+    
+    NavigationStack {
         HomeView(user: user, viewModel: viewModel)
             .modelContainer(container)
             .environment(sessionManager)

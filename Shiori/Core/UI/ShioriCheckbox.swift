@@ -45,7 +45,7 @@ struct ShioriCheckbox: View {
 }
 
 #Preview {
-    @Previewable @State var selectedSubjects: Set<NewsSubject> = []
+    @Previewable @State var selectedSubjects: Set<SummarySubject> = []
     let columns = [
         GridItem(.flexible()),
         GridItem(.flexible())
@@ -56,7 +56,7 @@ struct ShioriCheckbox: View {
             .ignoresSafeArea()
         
         LazyVGrid(columns: columns, spacing: 10) {
-            ForEach(NewsSubject.allCases, id: \.self) { subject in
+            ForEach(SummarySubject.allCases, id: \.self) { subject in
                 ShioriCheckbox(
                     title: subject.rawValue,
                     icon: subject.iconName,

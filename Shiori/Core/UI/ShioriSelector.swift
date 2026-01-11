@@ -110,7 +110,7 @@ struct ButtonHeightKey: PreferenceKey {
 }
 
 #Preview {
-    @Previewable @State var selectedDuration: NewsDuration = .standard
+    @Previewable @State var selectedDuration: SummaryDuration = .standard
     ZStack(alignment: .top) {
         Color(Color.backgroundShiori).ignoresSafeArea()
         
@@ -119,7 +119,7 @@ struct ButtonHeightKey: PreferenceKey {
             ShioriSelector(
                 title: "Select your news duration",
                 icon: "clock",
-                options: NewsDuration.allCases,
+                options: SummaryDuration.allCases,
                 selection: $selectedDuration,
                 textString: { $0.rawValue }
             )

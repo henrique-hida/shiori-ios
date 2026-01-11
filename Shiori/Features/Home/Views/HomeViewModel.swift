@@ -11,7 +11,7 @@ import Observation
 @MainActor
 @Observable
 final class HomeViewModel {
-    var newsArticles: [News] = []
+    var weekNewsSummaries: [Summary] = []
     var isLoading = false
     var errorMessage: String? = nil
     
@@ -30,7 +30,7 @@ final class HomeViewModel {
         
         do {
             let weekNews = try await syncService.syncAndLoadWeek(for: user)
-            self.newsArticles = weekNews
+            self.weekNewsSummaries = weekNews
             
             if weekNews.isEmpty {
                 self.errorMessage = "No news history found."

@@ -18,21 +18,16 @@ final class NewsSyncService {
         self.cloudRepo = cloudRepo
     }
 
-    func syncAndLoadWeek(for user: UserProfile, isBackgroundTask: Bool = false) async throws -> [News] {
+    func syncAndLoadWeek(for user: UserProfile, isBackgroundTask: Bool = false) async throws -> [Summary] {
         let today = Date()
         let localToday = try localRepo.fetchNews(forDate: today)
         
-        if localToday.isEmpty {
+        if localToday == nil {
             print("🌍 Today's news missing locally. Fetching from Cloud...")
-            
             do {
-                let fetchedArticles = try await cloudRepo.getTodayNews(preferences: user.newsPreferences)
-                let dbObjects = fetchedArticles.map {
-                    News(id: $0.id, category: $0.category, content: $0.content, date: $0.date, tone: $0.tone, wasRead: false)
-                }
-                try await localRepo.saveNews(dbObjects)
+                let fetchedSummary = try await cloudRepo.getTodayNews(preferences: user.newsPreferences)
+                try await localRepo.saveNews(fetchedSummary)
                 print("✅ Cloud fetch successful & saved.")
-                
                 if isBackgroundTask {
                     scheduleArrivalNotification(for: user)
                 }
@@ -42,13 +37,16 @@ final class NewsSyncService {
         } else {
             print("✅ Today's news is already locally cached.")
         }
+        
         return try localRepo.fetchWeekNews()
     }
     
     private func scheduleArrivalNotification(for user: UserProfile) {
         let content = UNMutableNotificationContent()
         content.title = "Your Daily Briefing is Ready 🗞️"
-        content.body = "Read your \(user.newsPreferences.duration.rawValue) summary about \(user.newsPreferences.subjects.first?.rawValue ?? "world news")."
+        
+        let subjectName = user.newsPreferences.subjects.first?.rawValue ?? "world news"
+        content.body = "Read your \(user.newsPreferences.duration.rawValue) summary about \(subjectName)."
         content.sound = .default
 
         var dateComponents = DateComponents()

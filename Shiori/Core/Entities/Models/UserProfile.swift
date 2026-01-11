@@ -13,6 +13,5 @@ struct UserProfile: Codable, Identifiable, Equatable {
     var isPremium: Bool
     var language: Language
     var theme: Theme
-    var weekStreak: [Bool]
-    var newsPreferences: NewsPreferences
+    var newsPreferences: NewsSummaryPreferences
 }

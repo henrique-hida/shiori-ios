@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum NewsStyle: String, Codable, CaseIterable {
+enum SummaryStyle: String, Codable, CaseIterable {
     case impartial = "impartial"
     case informal = "informal"
     case analytic = "analytic"

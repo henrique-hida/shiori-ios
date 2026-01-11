@@ -7,10 +7,10 @@
 
 import Foundation
 
-struct NewsPreferences: Codable, Equatable {
-    var duration: NewsDuration
-    var style: NewsStyle
-    var subjects: [NewsSubject]
+struct NewsSummaryPreferences: Codable, Equatable {
+    var duration: SummaryDuration
+    var style: SummaryStyle
+    var subjects: [SummarySubject]
     var language: Language
     var arriveTime: Int
 }

@@ -8,5 +8,5 @@
 import Foundation
 
 protocol CloudNewsRepositoryProtocol {
-    func getTodayNews(preferences: NewsPreferences) async throws -> [News]
+    func getTodayNews(preferences: NewsSummaryPreferences) async throws -> Summary
 }

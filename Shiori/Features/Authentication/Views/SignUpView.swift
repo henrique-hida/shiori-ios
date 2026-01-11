@@ -219,7 +219,7 @@ struct SecondStepView: View {
             ShioriSelector(
                 title: "Duration",
                 icon: "clock",
-                options: NewsDuration.allCases,
+                options: SummaryDuration.allCases,
                 selection: $viewModel.selectedDuration,
                 textString: { $0.rawValue }
             )
@@ -228,7 +228,7 @@ struct SecondStepView: View {
             ShioriSelector(
                 title: "Style",
                 icon: "newspaper",
-                options: NewsStyle.allCases,
+                options: SummaryStyle.allCases,
                 selection: $viewModel.selectedStyle,
                 textString: { $0.rawValue }
             )
@@ -245,7 +245,7 @@ struct SubjectsGrid: View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Interests").textLarge()
             
-            let subjects = NewsSubject.allCases
+            let subjects = SummarySubject.allCases
             let columnCount = 2
             let rowCount = (subjects.count + columnCount - 1) / columnCount
             

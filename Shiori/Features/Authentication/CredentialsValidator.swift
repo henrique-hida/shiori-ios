@@ -51,7 +51,7 @@ struct CredentialsValidator {
         }
     }
     
-    func isValidNewsSubjects(_ newsSubjects: Set<NewsSubject>) throws {
+    func isValidNewsSubjects(_ newsSubjects: Set<SummarySubject>) throws {
         guard !newsSubjects.isEmpty else {
             throw ValidationError.emptyField("news subjects")
         }

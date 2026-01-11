@@ -14,7 +14,7 @@ final class DatabaseProvider: Sendable {
     
     init(inMemory: Bool = false) {
         let schema = Schema([
-            NewsData.self
+            SummaryData.self
         ])
         
         let modelConfiguration = ModelConfiguration(

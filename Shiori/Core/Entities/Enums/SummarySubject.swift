@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum NewsSubject: String, Codable, Sendable, CaseIterable {
+enum SummarySubject: String, Codable, Sendable, CaseIterable {
     case politic = "Politics"
     case economyAndBusiness = "Economy & Business"
     case technology = "Technology"

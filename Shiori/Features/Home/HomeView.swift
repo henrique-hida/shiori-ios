@@ -72,7 +72,7 @@ struct HomeView: View {
             }
         }
         .navigationDestination(item: $viewModel.selectedSummary) { article in
-            ArticlesView(summary: article)
+            ArticlesView(summary: article, user: user)
         }
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -484,6 +484,7 @@ private struct LinkSummarySettings: View {
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
+                            .foregroundStyle(Color.textMuted)
                     }
                 }
             }

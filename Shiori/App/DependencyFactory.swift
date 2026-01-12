@@ -51,6 +51,10 @@ final class DependencyFactory {
         )
     }
     
+    func makeArticlesViewModel() -> ArticlesViewModel {
+        return ArticlesViewModel(readLaterRepo: readLaterRepo)
+    }
+    
     func makeNewsSyncService() -> NewsSyncService {
         let cloudRepo = FirestoreNewsRepository()
         return NewsSyncService(

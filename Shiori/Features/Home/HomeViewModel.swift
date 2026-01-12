@@ -25,24 +25,27 @@ final class HomeViewModel {
     
     var currentWeekStreak: [String: Bool] = [:]
     var currentWeekDates: [Date] = []
-    
     var readLaterSummaries: [ReadLater] = []
+    var subjectStats: [(subject: SummarySubject, percentage: Double)] = []
     
     private let syncService: NewsSyncServiceProtocol
     private let linkSummaryRepo: LinkSummaryRepositoryProtocol
     private let historyRepo: ReadingHistoryRepositoryProtocol
     private let readLaterRepo: ReadLaterRepositoryProtocol
+    private let statsRepo: SubjectStatsRepositoryProtocol
     
     init(
         syncService: NewsSyncServiceProtocol,
         linkSummaryRepo: LinkSummaryRepositoryProtocol,
         historyRepo: ReadingHistoryRepositoryProtocol,
-        readLaterRepo: ReadLaterRepositoryProtocol
+        readLaterRepo: ReadLaterRepositoryProtocol,
+        statsRepo: SubjectStatsRepositoryProtocol
     ){
         self.syncService = syncService
         self.linkSummaryRepo = linkSummaryRepo
         self.historyRepo = historyRepo
         self.readLaterRepo = readLaterRepo
+        self.statsRepo = statsRepo
         self.generateCurrentWeek()
     }
     
@@ -140,10 +143,15 @@ final class HomeViewModel {
     }
 
     func trackReadAction(user: UserProfile) {
+        guard let summary = selectedSummary else { return }
+        
         Task {
             try? await historyRepo.markTodayAsRead(user: user)
+            await statsRepo.increment(subjects: summary.subjects)
             await loadStreak()
+            await loadStats()
         }
+
     }
     
     func getDateKey(_ date: Date) -> String {
@@ -178,5 +186,10 @@ final class HomeViewModel {
 
     func isReadLater(_ id: String) -> Bool {
         return readLaterSummaries.contains(where: { $0.id == id })
+    }
+    
+    func loadStats() async {
+        let year = Calendar.current.component(.year, from: Date())
+        self.subjectStats = await statsRepo.getYearlyStats(year: year)
     }
 }

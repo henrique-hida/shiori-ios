@@ -52,7 +52,7 @@ struct HomeView: View {
                             }
                             WeekHistory(viewModel: viewModel)
                             ReadLaterView(viewModel: viewModel)
-                            Dashboard(weekNews: viewModel.weekNewsSummaries)
+                            Dashboard(stats: viewModel.subjectStats)
                         }
                     }
                 }
@@ -62,6 +62,7 @@ struct HomeView: View {
                         await viewModel.loadNews(for: user)
                         await viewModel.loadStreak()
                         await viewModel.loadReadLater()
+                        await viewModel.loadStats()
                     }
                 }
                 .onChange(of: viewModel.selectedSummary) { _, newValue in
@@ -360,90 +361,71 @@ private struct ReadLaterView: View {
 }
 
 private struct Dashboard: View {
-    var weekNews: [Summary]
+    var stats: [(subject: SummarySubject, percentage: Double)]
+    var topStat: (subject: SummarySubject, percentage: Double)? {
+        stats.first
+    }
+    var listStats: [(subject: SummarySubject, percentage: Double)] {
+        Array(stats.dropFirst().prefix(3))
+    }
     
     var body: some View {
         VStack(spacing: 15) {
-            Text("Most read subjects")
+            Text("Most read subjects this year")
                 .bold()
                 .subTitle()
             
-            HStack(spacing: 10) {
-                Spacer()
-                VStack(alignment: .center) {
-                    Text("40%")
-                        .title()
-                    
-                    Text("Economy")
-                        .foregroundStyle(Color.accent)
-                        .bold()
-                        .subTitle()
+            VStack(spacing: 15) {
+                if stats.isEmpty {
+                    Text("Read some news to see your stats!")
+                        .foregroundStyle(Color.textMuted)
+                        .padding()
+                } else {
+                    GeometryReader { geo in
+                        HStack(spacing: 15) {
+                            if let top = topStat {
+                                VStack(alignment: .center) {
+                                    Text("\(Int(top.percentage * 100))%")
+                                        .title()
+                                    
+                                    Text(top.subject.rawValue.capitalized)
+                                        .foregroundStyle(Color.accent)
+                                        .bold()
+                                        .subTitle()
+                                        .multilineTextAlignment(.center)
+                                }
+                                .frame(width: geo.size.width * 0.4)
+                            }
+                            
+                            VStack(spacing: 15) {
+                                ForEach(listStats, id: \.subject) { stat in
+                                    VStack(spacing: 3) {
+                                        HStack {
+                                            Text(stat.subject.rawValue.capitalized)
+                                                .textSmall()
+                                                .lineLimit(1)
+                                            Spacer()
+                                            Text("\(Int(stat.percentage * 100))%")
+                                                .textSmall()
+                                        }
+                                        ZStack(alignment: .leading) {
+                                            Capsule()
+                                                .foregroundStyle(Color.bg)
+                                                .frame(height: 10)
+                                            
+                                            Capsule()
+                                                .foregroundStyle(Color.accent)
+                                                .frame(width: (geo.size.width * 0.4) * CGFloat(stat.percentage), height: 10)
+                                        }
+                                    }
+                                }
+                            }
+                            .frame(width: geo.size.width * 0.5)
+                        }
+                        .frame(height: geo.size.height, alignment: .center)
+                    }
+                    .frame(height: 140)
                 }
-                Spacer()
-                
-                VStack(spacing: 15) {
-                    VStack(spacing: 3) {
-                        HStack {
-                            Text("Politics")
-                                .textSmall()
-                            Spacer()
-                            Text("30%")
-                                .textSmall()
-                        }
-                        ZStack(alignment: .leading) {
-                            Capsule()
-                                .foregroundStyle(Color.bg)
-                                .frame(height: 10)
-                                .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
-                            
-                            Capsule()
-                                .foregroundStyle(Color.accent)
-                                .frame(width: 150*0.3, height: 10)
-                        }
-                    }
-                    VStack(spacing: 3) {
-                        HStack {
-                            Text("Politics")
-                                .textSmall()
-                            Spacer()
-                            Text("20%")
-                                .textSmall()
-                        }
-                        ZStack(alignment: .leading) {
-                            Capsule()
-                                .foregroundStyle(Color.bg)
-                                .frame(height: 10)
-                                .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
-                            
-                            Capsule()
-                                .foregroundStyle(Color.accent)
-                                .frame(width: 150*0.2, height: 10)
-                        }
-                    }
-                    VStack(spacing: 3) {
-                        HStack {
-                            Text("Politics")
-                                .textSmall()
-                            Spacer()
-                            Text("10%")
-                                .textSmall()
-                        }
-                        ZStack(alignment: .leading) {
-                            Capsule()
-                                .foregroundStyle(Color.bg)
-                                .frame(height: 10)
-                                .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
-                            
-                            Capsule()
-                                .foregroundStyle(Color.accent)
-                                .frame(width: 150*0.1, height: 10)
-                        }
-                    }
-                }
-                .frame(width: 150)
-                
-                Spacer()
-                
             }
             .frame(maxWidth: .infinity)
             .padding(20)
@@ -451,7 +433,6 @@ private struct Dashboard: View {
             .clipShape(RoundedRectangle(cornerRadius: 20))
             .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
         }
-        
     }
 }
 
@@ -497,11 +478,13 @@ private struct LinkSummarySettings: View {
 @MainActor
 func makePreviewDependencies() -> (ModelContainer, HomeViewModel, UserProfile, SessionManager) {
     let sessionManager = DependencyFactory.shared.makeSessionManager()
-    let schema = Schema([SummaryData.self, ReadLaterData.self])
+    let schema = Schema([SummaryData.self, ReadLaterData.self, SubjectStatsData.self])
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     let container = try! ModelContainer(for: schema, configurations: config)
     
     let today = Date()
+    let currentYear = Calendar.current.component(.year, from: today)
+    
     let thumbs = [
         "https://s2-g1.glbimg.com/3XJW8mtAXe4jrnXB8B149_d4jm8=/0x0:1248x702/1000x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_59edd422c0c84a879bd37670ae4f538a/internal_photos/bs/2026/T/C/wTq3RuT8KAkBmPw6b8Nw/1-reuters-bloco12.jpg",
         "https://s2-g1.glbimg.com/0JXVCAyWVMO9w30Yk4qOSZUu7Ss=/0x0:4288x2848/1000x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_59edd422c0c84a879bd37670ae4f538a/internal_photos/bs/2026/i/u/xcqHrtSKi0P7BxeosVmw/ross-parmly-rf6ywhvkrly-unsplash.jpg",
@@ -543,18 +526,33 @@ func makePreviewDependencies() -> (ModelContainer, HomeViewModel, UserProfile, S
         }
     }
     
+    let mockStats: [(subject: SummarySubject, count: Int)] = [
+        (.technology, 25),
+        (.economyAndBusiness, 15),
+        (.healthAndScience, 8),
+        (.entertainmentAndCulture, 2)
+    ]
+    
+    for stat in mockStats {
+        let entry = SubjectStatsData(year: currentYear, subject: stat.subject)
+        entry.count = stat.count
+        container.mainContext.insert(entry)
+    }
+    
     let localRepo = LocalNewsRepository(context: container.mainContext)
     let cloudRepo = MockNewsDatabaseRepository()
     let syncService = NewsSyncService(localRepo: localRepo, cloudRepo: cloudRepo)
     let linkSummaryRepo = GeminiLinkSummaryRepository(apiKey: "")
     let historyRepo = ReadingHistoryRepository(modelContext: container.mainContext)
     let readLaterRepo = ReadLaterRepository(modelContext: container.mainContext)
+    let statsRepo = SubjectStatsRepository(modelContext: container.mainContext)
     
     let viewModel = HomeViewModel(
         syncService: syncService,
         linkSummaryRepo: linkSummaryRepo,
         historyRepo: historyRepo,
-        readLaterRepo: readLaterRepo
+        readLaterRepo: readLaterRepo,
+        statsRepo: statsRepo
     )
     
     let dummyPrefs = NewsSummaryPreferences(

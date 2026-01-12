@@ -17,6 +17,7 @@ final class DependencyFactory {
     private let localNewsRepo: LocalNewsRepositoryProtocol
     private let historyRepo: ReadingHistoryRepositoryProtocol
     private let readLaterRepo: ReadLaterRepositoryProtocol
+    private let statsRepo: SubjectStatsRepositoryProtocol
     
     private init() {
         let dbContext = DatabaseProvider.shared.container.mainContext
@@ -26,6 +27,7 @@ final class DependencyFactory {
         self.localNewsRepo = LocalNewsRepository(context: dbContext)
         self.historyRepo = ReadingHistoryRepository(modelContext: dbContext)
         self.readLaterRepo = ReadLaterRepository(modelContext: dbContext)
+        self.statsRepo = SubjectStatsRepository(modelContext: dbContext)
     }
     
     func makeSessionManager() -> SessionManager {
@@ -47,7 +49,8 @@ final class DependencyFactory {
             syncService: service,
             linkSummaryRepo: linkSummaryRepo,
             historyRepo: historyRepo,
-            readLaterRepo: readLaterRepo
+            readLaterRepo: readLaterRepo,
+            statsRepo: statsRepo
         )
     }
     

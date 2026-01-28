@@ -49,7 +49,7 @@ struct ArticlesView: View {
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Text(summary.createdAt.formatted(.dateTime.day().month().year()))
-                    .foregroundStyle(Color.textMuted)
+                    .foregroundStyle(.textMuted)
                     .textLarge()
             }
             
@@ -58,11 +58,14 @@ struct ArticlesView: View {
                     print("Menu tapped")
                 }) {
                     Image(systemName: "line.3.horizontal")
-                        .foregroundStyle(Color.textMuted)
+                        .foregroundStyle(.textMuted)
                 }
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .onDisappear {
+            viewModel.cleanup()
+        }
     }
     func testDatePrinting() {
         let now = Date()
@@ -76,7 +79,6 @@ private struct AudioPlayer: View {
     var viewModel: ArticlesViewModel
     let summary: Summary
     let user: UserProfile
-    var isPlaying: Bool = false
     
     @State private var progress: Double = 0.3
     @State private var showSources = false
@@ -84,26 +86,30 @@ private struct AudioPlayer: View {
     var body: some View {
         VStack(spacing: 10) {
             Slider(value: $progress)
-                .tint(Color.accent)
+                .tint(.accentPrimary)
             
             ZStack(alignment: .center) {
                 HStack(spacing: 30) {
                     Image(systemName: "10.arrow.trianglehead.counterclockwise")
                         .font(.system(size: 24))
-                        .foregroundStyle(Color.accent)
+                        .foregroundStyle(.accentPrimary)
                     
-                    Circle()
-                        .overlay(
-                            Image(systemName: isPlaying ? "pause.fill" : "play.fill")
-                                .font(.system(size: 24))
-                                .foregroundStyle(Color.bg)
-                        )
-                        .foregroundStyle(Color.accent)
-                        .frame(width: 60)
+                    Button {
+                        viewModel.toggleAudio(text: summary.content, language: user.newsPreferences.language)
+                    } label: {
+                        Circle()
+                            .overlay(
+                                Image(systemName: viewModel.audioService.isPlaying ? "pause.fill" : "play.fill")
+                                    .font(.system(size: 24))
+                                    .foregroundStyle(.bg)
+                            )
+                            .foregroundStyle(.accentPrimary)
+                            .frame(width: 60)
+                    }
                     
                     Image(systemName: "10.arrow.trianglehead.clockwise")
                         .font(.system(size: 24))
-                        .foregroundStyle(Color.accent)
+                        .foregroundStyle(.accentPrimary)
                 }
                 
                 HStack {
@@ -122,12 +128,13 @@ private struct AudioPlayer: View {
                         }
                     } label: {
                         Image(systemName: "ellipsis")
-                            .foregroundStyle(Color.textMuted)
+                            .foregroundStyle(.textMuted)
                     }
                 }
             }
         }
         .padding(.horizontal, 20)
+        .background(.ultraThinMaterial)
         .sheet(isPresented: $showSources) {
             SourcesSheet(sources: summary.sources)
                 .presentationDetents([.medium, .large])
@@ -145,22 +152,22 @@ private struct SourcesSheet: View {
             List {
                 if sources.isEmpty {
                     Text("No sources available")
-                        .foregroundStyle(Color.textMuted)
+                        .foregroundStyle(.textMuted)
                 } else {
                     ForEach(sources, id: \.self) { urlString in
                         if let url = URL(string: urlString) {
                             Link(destination: url) {
                                 HStack(spacing: 10) {
                                     Image(systemName: "safari")
-                                        .foregroundStyle(Color.accent)
+                                        .foregroundStyle(.accentPrimary)
                                     
                                     VStack(alignment: .leading) {
                                         Text(url.host() ?? urlString)
-                                            .foregroundStyle(Color.text)
+                                            .foregroundStyle(.textPrimary)
                                             .font(.headline)
                                         
                                         Text("Click to read the original article")
-                                            .foregroundStyle(Color.textMuted)
+                                            .foregroundStyle(.textMuted)
                                             .font(.caption)
                                             .lineLimit(1)
                                     }
@@ -169,7 +176,7 @@ private struct SourcesSheet: View {
                                     
                                     Image(systemName: "arrow.up.right")
                                         .font(.caption)
-                                        .foregroundStyle(Color.accent)
+                                        .foregroundStyle(.accentPrimary)
                                 }
                                 .padding(.vertical, 4)
                             }
@@ -187,7 +194,7 @@ private struct SourcesSheet: View {
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
-                            .foregroundStyle(Color.textMuted)
+                            .foregroundStyle(.textMuted)
                     }
                 }
             }

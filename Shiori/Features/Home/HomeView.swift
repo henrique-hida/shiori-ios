@@ -26,7 +26,8 @@ struct HomeView: View {
     var body: some View {
         ZStack {
             // background
-            Color(Color.backgroundShiori)
+            Rectangle()
+                .fill(.bg)
                 .ignoresSafeArea()
             
             // content
@@ -81,7 +82,7 @@ struct HomeView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 80)
-                    .foregroundStyle(Color.textMuted)
+                    .foregroundStyle(.textMuted)
             }
             
             ToolbarItem(placement: .topBarTrailing) {
@@ -115,7 +116,7 @@ private struct SearchBar: View {
         }
         .frame(height: 10)
         .padding()
-        .background(Color(Color.backgroundLightShiori))
+        .background(.bgLight)
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
         .overlay(alignment: .trailing) {
@@ -130,7 +131,7 @@ private struct SearchBar: View {
                         Image(systemName: "magnifyingglass")
                             .resizable()
                             .frame(width: 20, height: 20)
-                            .foregroundStyle(Color.textButtonShiori)
+                            .foregroundStyle(.textButton)
                     }
             })
         }
@@ -148,11 +149,11 @@ private struct MainCard: View {
         VStack(alignment: .leading) {
             VStack(alignment: .leading) {
                 Text("Last news")
-                    .foregroundStyle(Color.accentSecondaryShiori)
+                    .foregroundStyle(.accentSub)
                     .textSmall()
                 
                 Text(latestNewsDate)
-                    .foregroundStyle(Color.textButtonShiori)
+                    .foregroundStyle(.textButton)
                     .newsDate()
             }
             
@@ -165,9 +166,9 @@ private struct MainCard: View {
                     .frame(width: 50, height: 50)
                     .overlay(
                         Image(systemName: viewModel.isPlayingLastNews ? "pause.fill" : "play.fill")
-                            .foregroundStyle(Color.accent)
+                            .foregroundStyle(.accentPrimary)
                     )
-                    .foregroundStyle(Color.accentButton)
+                    .foregroundStyle(.accentButton)
             }
             
         }
@@ -195,7 +196,7 @@ private struct MainCard: View {
                 .frame(maxWidth: .infinity, alignment: .trailing)
             }
         }
-        .background(Color.accent)
+        .background(.accentPrimary)
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
         .onTapGesture {
@@ -217,7 +218,7 @@ private struct CardCarousel: View {
                     VStack(alignment: .leading) {
                         VStack(alignment: .leading) {
                             Text(news.createdAt.formatted(.dateTime.weekday(.abbreviated)))
-                                .foregroundStyle(Color.textMuted)
+                                .foregroundStyle(.textMuted)
                                 .textSmall()
                             
                             Text(news.createdAt.formatted(.dateTime.day().month()))
@@ -247,7 +248,7 @@ private struct CardCarousel: View {
                             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
                         }
                     }
-                    .background(Color.backgroundLightShiori)
+                    .background(.bgLight)
                     .clipShape(RoundedRectangle(cornerRadius: 20))
                     .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
                     .onTapGesture {
@@ -278,12 +279,12 @@ private struct WeekHistory: View {
                     VStack(spacing: 10) {
                         Image(systemName: isRead ? "flame.fill" : "flame")
                             .font(.system(size: 30))
-                            .foregroundStyle(isRead ? Color.accent : Color.textMuted.opacity(isFutureDate ? 0.3 : 0.7))
+                            .foregroundStyle(isRead ? .accentPrimary : .textMuted.opacity(isFutureDate ? 0.3 : 0.7))
                         
                         Text(date.formatted(.dateTime.weekday(.narrow)))
                             .bold()
                             .font(.caption)
-                            .foregroundStyle(viewModel.isToday(date) ? Color.textMuted : Color.textMuted.opacity(0.3))
+                            .foregroundStyle(viewModel.isToday(date) ? .textMuted : .textMuted.opacity(0.3))
                             .bold(viewModel.isToday(date))
                     }
                     .frame(maxWidth: .infinity)
@@ -292,7 +293,7 @@ private struct WeekHistory: View {
             .frame(height: 85)
             .frame(maxWidth: .infinity)
             .padding(20)
-            .background(Color.bgLight)
+            .background(.bgLight)
             .clipShape(RoundedRectangle(cornerRadius: 20))
             .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
         }
@@ -329,7 +330,7 @@ private struct ReadLaterView: View {
                             
                             VStack {
                                 Text(summary.createdAt.formatted(.dateTime.day().month(.omitted)))
-                                    .foregroundStyle(Color.text)
+                                    .foregroundStyle(.textPrimary)
                                     .bold()
                                     .subTitle()
                                 
@@ -340,7 +341,7 @@ private struct ReadLaterView: View {
                         .frame(height: 40)
                         .frame(maxWidth: .infinity)
                         .padding(20)
-                        .background(Color.bgLight)
+                        .background(.bgLight)
                         .clipShape(RoundedRectangle(cornerRadius: 20))
                         .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
                     }
@@ -348,11 +349,11 @@ private struct ReadLaterView: View {
                 
                 HStack {
                     Text("See all")
-                        .foregroundStyle(Color.accent)
+                        .foregroundStyle(.accentPrimary)
                         .frame(maxWidth: .infinity, alignment: .trailing)
                     
                     Image(systemName: "arrow.forward")
-                        .foregroundStyle(Color.accent)
+                        .foregroundStyle(.accentPrimary)
                 }
                 
             }
@@ -378,7 +379,7 @@ private struct Dashboard: View {
             VStack(spacing: 15) {
                 if stats.isEmpty {
                     Text("Read some news to see your stats!")
-                        .foregroundStyle(Color.textMuted)
+                        .foregroundStyle(.textMuted)
                         .padding()
                 } else {
                     GeometryReader { geo in
@@ -389,7 +390,7 @@ private struct Dashboard: View {
                                         .title()
                                     
                                     Text(top.subject.rawValue.capitalized)
-                                        .foregroundStyle(Color.accent)
+                                        .foregroundStyle(.accentPrimary)
                                         .bold()
                                         .subTitle()
                                         .multilineTextAlignment(.center)
@@ -410,11 +411,11 @@ private struct Dashboard: View {
                                         }
                                         ZStack(alignment: .leading) {
                                             Capsule()
-                                                .foregroundStyle(Color.bg)
+                                                .foregroundStyle(.bg)
                                                 .frame(height: 10)
                                             
                                             Capsule()
-                                                .foregroundStyle(Color.accent)
+                                                .foregroundStyle(.accentPrimary)
                                                 .frame(width: (geo.size.width * 0.4) * CGFloat(stat.percentage), height: 10)
                                         }
                                     }
@@ -429,7 +430,7 @@ private struct Dashboard: View {
             }
             .frame(maxWidth: .infinity)
             .padding(20)
-            .background(Color.bgLight)
+            .background(.bgLight)
             .clipShape(RoundedRectangle(cornerRadius: 20))
             .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
         }
@@ -465,7 +466,7 @@ private struct LinkSummarySettings: View {
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
-                            .foregroundStyle(Color.textMuted)
+                            .foregroundStyle(.textMuted)
                     }
                 }
             }

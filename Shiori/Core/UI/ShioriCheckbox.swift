@@ -18,26 +18,26 @@ struct ShioriCheckbox: View {
         Button(action: action) {
             HStack(spacing: 10) {
                 Image(systemName: icon)
-                    .foregroundStyle(isSelected ? Color.textButtonShiori : Color.textMutedShiori)
+                    .foregroundStyle(isSelected ? .textButton : .textMuted)
                     .frame(width: 20)
                     .textLabelMuted()
                 
                 Text(title.capitalized)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
-                    .foregroundStyle(isSelected ? Color.textButtonShiori : Color.textMutedShiori)
+                    .foregroundStyle(isSelected ? .textButton : .textMuted)
                     .textLabelMuted()
                 
                 Spacer()
                 
                 Image(systemName: isSelected ? "checkmark.square.fill" : "square")
-                    .foregroundStyle(isSelected ? Color.textButtonShiori : Color.textMutedShiori)
+                    .foregroundStyle(isSelected ? .textButton : .textMuted)
             }
             .padding(.horizontal, 15)
             .padding(.vertical, 10)
             .background(
                 RoundedRectangle(cornerRadius: 15)
-                    .fill(isSelected ? Color.accentPrimaryShiori : Color.backgroundLightShiori)
+                    .fill(isSelected ? .accentPrimary : .bgLight)
                     .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
             )
         }
@@ -52,7 +52,8 @@ struct ShioriCheckbox: View {
     ]
     
     ZStack {
-        Color.backgroundShiori
+        Rectangle()
+            .fill(.bg)
             .ignoresSafeArea()
         
         LazyVGrid(columns: columns, spacing: 10) {

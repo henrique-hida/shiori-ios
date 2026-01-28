@@ -51,7 +51,7 @@ struct ShioriSelector<T: Hashable>: View {
                 )
                 .background(
                     RoundedRectangle(cornerRadius: 15)
-                        .foregroundStyle(Color.backgroundLightShiori)
+                        .foregroundStyle(.bgLight)
                         .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
                 )
             }
@@ -68,12 +68,12 @@ struct ShioriSelector<T: Hashable>: View {
                             } label: {
                                 HStack {
                                     Text(textString(option).capitalized)
-                                        .foregroundStyle(selection == option ? Color.accentColor : Color.textPrimaryShiori)
+                                        .foregroundStyle(selection == option ? .accentPrimary : .textPrimary)
                                         .textLabelSelected()
                                     Spacer()
                                     if selection == option {
                                         Image(systemName: "checkmark")
-                                            .foregroundStyle(Color.accentColor)
+                                            .foregroundStyle(.accentPrimary)
                                             .textLabelSelected()
                                     }
                                 }
@@ -88,7 +88,7 @@ struct ShioriSelector<T: Hashable>: View {
                     .clipShape(RoundedRectangle(cornerRadius: 15))
                     .background(
                         RoundedRectangle(cornerRadius: 15)
-                            .fill(Color.backgroundLightShiori)
+                            .fill(.bgLight)
                             .shadow(color: .black.opacity(0.1), radius: 4, y: 4)
                     )
                     .frame(maxWidth: .infinity)
@@ -112,7 +112,9 @@ struct ButtonHeightKey: PreferenceKey {
 #Preview {
     @Previewable @State var selectedDuration: SummaryDuration = .standard
     ZStack(alignment: .top) {
-        Color(Color.backgroundShiori).ignoresSafeArea()
+        Rectangle()
+            .fill(.bg)
+            .ignoresSafeArea()
         
         VStack(spacing: 20) {
             Spacer()

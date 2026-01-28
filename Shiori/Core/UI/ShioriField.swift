@@ -40,13 +40,14 @@ struct ShioriField: View {
                 Group {
                     if style == .text {
                         TextField(placeholder, text: $text, prompt: Text(placeholder)
-                            .foregroundStyle(Color(Color.textMutedShiori)))
-                        .keyboardType(keyboard)
+                            .foregroundStyle(.textMuted))
+                            .keyboardType(keyboard)
                     } else {
                         if !showSecureField {
-                            SecureField(placeholder, text: $text, prompt: Text(placeholder).foregroundStyle(Color(Color.textMutedShiori)))
+                            SecureField(placeholder, text: $text, prompt: Text(placeholder)
+                                .foregroundStyle(.textMuted))
                         } else {
-                            TextField(placeholder, text: $text, prompt: Text(placeholder).foregroundStyle(Color(Color.textMutedShiori)))
+                            TextField(placeholder, text: $text, prompt: Text(placeholder).foregroundStyle(.textMuted))
                         }
                         Image(systemName: showSecureField ? "eye" : "eye.slash")
                             .textLabelMuted()
@@ -55,11 +56,11 @@ struct ShioriField: View {
                             }
                     }
                 }
-                .tint(Color(Color.accentPrimaryShiori))
+                .tint(.accentPrimary)
             }
             .frame(height: 20)
             .padding()
-            .background(Color(Color.backgroundLightShiori))
+            .background(.bgLight)
             .clipShape(RoundedRectangle(cornerRadius: 15))
             .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
             .overlay(

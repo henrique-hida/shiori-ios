@@ -20,7 +20,8 @@ struct SignUpView: View {
         GeometryReader { geo in
             ZStack {
                 // background
-                Color(Color.backgroundShiori)
+                Rectangle()
+                    .fill(.bg)
                     .ignoresSafeArea()
                 
                 // content
@@ -54,7 +55,7 @@ struct SignUpView: View {
                     .padding(.horizontal, 25)
                     .padding(.bottom, 25)
                     .padding(.top, 10)
-                    .background(Color.backgroundShiori)
+                    .background(.bg)
                 }
             }
         }
@@ -79,7 +80,7 @@ private struct BackButton: View {
                     Image(systemName: "chevron.left")
                     Text("Back")
                 }
-                .foregroundStyle(Color.textMutedShiori)
+                .foregroundStyle(.textMuted)
                 .appFont(16, weight: .regular)
             }
             Spacer()
@@ -113,11 +114,11 @@ private struct ProgressBar: View {
             ZStack(alignment: .leading) {
                 RoundedRectangle(cornerRadius: 10)
                     .frame(height: 6)
-                    .foregroundStyle(Color.backgroundLightShiori)
+                    .foregroundStyle(.bgLight)
                 
                 RoundedRectangle(cornerRadius: 10)
                     .frame(width: (maxWidth - 50) * (CGFloat(currentStep) / CGFloat(totalSteps)), height: 6)
-                    .foregroundStyle(Color.accentPrimaryShiori)
+                    .foregroundStyle(.accentPrimary)
             }
             .frame(height: 6)
         }

@@ -13,7 +13,8 @@ struct StartingView: View {
         GeometryReader { geo in
             ZStack {
                 // background
-                Color(Color.backgroundShiori)
+                Rectangle()
+                    .fill(.bg)
                     .ignoresSafeArea()
                 
                 //content
@@ -77,18 +78,18 @@ private struct ButtonsView: View {
             NavigationLink(destination: SignInView()) {
                 RoundedRectangle(cornerRadius: 15)
                     .frame(height: 55)
-                    .foregroundStyle(Color.accentPrimaryShiori)
+                    .foregroundStyle(.accentPrimary)
                     .overlay(Text("Login")
                         .textButton()
                     )
             }
             NavigationLink(destination: SignUpView()) {
                 RoundedRectangle(cornerRadius: 15)
-                    .stroke(Color(Color.accentPrimaryShiori), lineWidth: 2)
+                    .stroke(.accentPrimary, lineWidth: 2)
                     .contentShape(RoundedRectangle(cornerRadius: 15))
                     .frame(height: 55)
                     .overlay(Text("Register")
-                        .foregroundStyle(Color.accentPrimaryShiori)
+                        .foregroundStyle(.accentPrimary)
                         .textButton()
                     )
             }

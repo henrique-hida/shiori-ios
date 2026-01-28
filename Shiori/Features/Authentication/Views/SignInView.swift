@@ -19,7 +19,8 @@ struct SignInView: View {
         GeometryReader { geo in
             ZStack {
                 // background
-                Color(Color.backgroundShiori)
+                Rectangle()
+                    .fill(.bg)
                     .ignoresSafeArea()
                 
                 // content

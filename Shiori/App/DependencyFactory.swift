@@ -55,7 +55,9 @@ final class DependencyFactory {
     }
     
     func makeArticlesViewModel() -> ArticlesViewModel {
-        return ArticlesViewModel(readLaterRepo: readLaterRepo)
+        let audioService = AVFAudioService()
+        //let audioService = UnrealAudioService(apiKey: Bundle.main.unrealApiKey)
+        return ArticlesViewModel(readLaterRepo: readLaterRepo, audioService: audioService)
     }
     
     func makeNewsSyncService() -> NewsSyncService {
@@ -70,5 +72,8 @@ final class DependencyFactory {
 extension Bundle {
     var geminiApiKey: String {
         return object(forInfoDictionaryKey: "GeminiAPIKey") as? String ?? ""
+    }
+    var unrealApiKey: String {
+        return object(forInfoDictionaryKey: "UnrealApiKey") as? String ?? ""
     }
 }

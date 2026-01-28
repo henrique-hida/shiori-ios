@@ -4,7 +4,6 @@
 //
 //  Created by Henrique Hida on 18/11/25.
 //
-
 import SwiftUI
 
 struct ShioriButton: View {
@@ -22,11 +21,11 @@ struct ShioriButton: View {
             Group {
                 if style == .primary {
                     RoundedRectangle(cornerRadius: 15)
-                        .fill(Color(Color.accentPrimaryShiori))
+                        .fill(.accentPrimary)
                         .overlay(buttonText)
                 } else {
                     RoundedRectangle(cornerRadius: 15)
-                        .stroke(Color(Color.accentPrimaryShiori), lineWidth: 2)
+                        .stroke(.accentPrimary, lineWidth: 2)
                         .contentShape(RoundedRectangle(cornerRadius: 15))
                         .overlay(buttonText)
                 }
@@ -39,7 +38,7 @@ struct ShioriButton: View {
     private var buttonText: some View {
         Text(title)
             .font(Font.custom("Roboto-Bold", size: 16))
-            .foregroundStyle(style == .primary ? Color(Color.textButtonShiori) : Color(Color.accentPrimaryShiori))
+            .foregroundStyle(style == .primary ? .textButton : .accentPrimary)
     }
 }
 

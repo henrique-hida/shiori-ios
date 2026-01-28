@@ -40,53 +40,53 @@ extension View {
     
     func textSmall() -> some View {
         self.appFont(14, weight: .regular)
-            .foregroundStyle(Color.textMutedShiori)
+            .foregroundStyle(.textMuted)
     }
     
     func textMedium() -> some View {
         self.appFont(14, weight: .regular)
-            .foregroundStyle(Color.textPrimaryShiori)
+            .foregroundStyle(.textPrimary)
     }
     
     func textLabelMuted() -> some View {
         self.appFont(16, weight: .regular)
-            .foregroundStyle(Color.textMutedShiori)
+            .foregroundStyle(.textMuted)
     }
     
     func textLabelSelected() -> some View {
         self.appFont(16, weight: .regular)
-            .foregroundStyle(Color.textPrimaryShiori)
+            .foregroundStyle(.textPrimary)
     }
     
     func textLarge() -> some View {
         self.appFont(16, weight: .bold)
-            .foregroundStyle(Color.textPrimaryShiori)
+            .foregroundStyle(.textPrimary)
     }
     
     func newsDate() -> some View {
         self.appFont(24, weight: .bold)
-            .foregroundStyle(Color.textButtonShiori)
+            .foregroundStyle(.textButton)
     }
     
     func title() -> some View {
         self.appFont(48, weight: .bold)
-            .foregroundStyle(Color.accentPrimaryShiori)
+            .foregroundStyle(.accentPrimary)
     }
     
     func subTitle() -> some View {
         self.appFont(20, weight: .regular)
-            .foregroundStyle(Color.textMutedShiori)
+            .foregroundStyle(.textMuted)
     }
     
     func textButton() -> some View {
         self.appFont(16, weight: .bold)
-            .foregroundStyle(Color.textButton)
+            .foregroundStyle(.textButton)
     }
     
     func link() -> some View {
         self.appFont(14, weight: .regular)
-            .foregroundStyle(Color.accentPrimaryShiori)
-            .underline(color: Color.accentPrimaryShiori)
+            .foregroundStyle(.accentPrimary)
+            .underline(color: .accentPrimary)
     }
     
 }

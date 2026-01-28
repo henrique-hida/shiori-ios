@@ -17,3 +17,8 @@ struct Summary: Identifiable, Codable, Sendable, Hashable {
     let subjects: [SummarySubject]
     let type: SummaryType
 }
+
+enum SummaryType: String, Codable, Sendable {
+    case news = "news"
+    case link = "link"
+}

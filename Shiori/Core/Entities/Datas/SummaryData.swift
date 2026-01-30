@@ -30,4 +30,17 @@ final class SummaryData {
         self.subjects = subjects
         self.type = type
     }
+    
+    var summaryRaw: Summary {
+        Summary(
+            id: self.id,
+            title: self.title,
+            content: self.content,
+            createdAt: self.createdAt,
+            thumbUrl: self.thumbUrl,
+            sources: self.sources,
+            subjects: self.subjects,
+            type: self.type
+        )
+    }
 }

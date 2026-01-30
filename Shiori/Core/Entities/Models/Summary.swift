@@ -16,6 +16,20 @@ struct Summary: Identifiable, Codable, Sendable, Hashable {
     let sources: [String]
     let subjects: [SummarySubject]
     let type: SummaryType
+    
+    var summaryData: SummaryData {
+        SummaryData(
+            id: self.id,
+            title: self.title,
+            content: self.content,
+            createdAt: self.createdAt,
+            thumbUrl: self.thumbUrl,
+            sources: self.sources,
+            subjects: self.subjects,
+            type: self.type
+        )
+    }
+        
 }
 
 enum SummaryType: String, Codable, Sendable {

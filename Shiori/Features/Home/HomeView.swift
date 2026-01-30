@@ -476,111 +476,31 @@ private struct LinkSummarySettings: View {
     }
 }
 
-@MainActor
-func makePreviewDependencies() -> (ModelContainer, HomeViewModel, UserProfile, SessionManager) {
-    let sessionManager = DependencyFactory.shared.makeSessionManager()
-    let schema = Schema([SummaryData.self, ReadLaterData.self, SubjectStatsData.self])
-    let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(for: schema, configurations: config)
+#Preview {
+    let preview = Preview(SummaryData.self, ReadLaterData.self, SubjectStatsData.self)
+    preview.addExamples(Summary.sampleSummaries)
+    preview.addExamples(ReadLaterData.sampleReadLater)
+    preview.addExamples(SubjectStatsData.sampleStats)
     
-    let today = Date()
-    let currentYear = Calendar.current.component(.year, from: today)
-    
-    let thumbs = [
-        "https://s2-g1.glbimg.com/3XJW8mtAXe4jrnXB8B149_d4jm8=/0x0:1248x702/1000x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_59edd422c0c84a879bd37670ae4f538a/internal_photos/bs/2026/T/C/wTq3RuT8KAkBmPw6b8Nw/1-reuters-bloco12.jpg",
-        "https://s2-g1.glbimg.com/0JXVCAyWVMO9w30Yk4qOSZUu7Ss=/0x0:4288x2848/1000x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_59edd422c0c84a879bd37670ae4f538a/internal_photos/bs/2026/i/u/xcqHrtSKi0P7BxeosVmw/ross-parmly-rf6ywhvkrly-unsplash.jpg",
-        "https://s2-g1.glbimg.com/NqAipQiZ_MfwlOeayDsG23X-tAo=/0x0:5500x3668/1000x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_59edd422c0c84a879bd37670ae4f538a/internal_photos/bs/2025/R/Z/I8xuVGStCgJiGF04jD4w/2025-03-15t173620z-1738905982-rc2qdda6qmye-rtrmadp-3-greenland-protest.jpg",
-        "https://ichef.bbci.co.uk/news/1536/cpsprodpb/6c3d/live/0fbabe30-eec5-11f0-b5f7-49f0357294ff.jpg.webp",
-        "https://ichef.bbci.co.uk/images/ic/1920xn/p0mrqq2n.jpg.webp",
-        "https://ichef.bbci.co.uk/images/ic/1920xn/p0ms3mr2.jpg.webp",
-        "https://static.toiimg.com/thumb/msid-126465790,imgsize-34908,width-400,resizemode-4/trump-cuban-flag.jpg"
-    ]
-    
-    for i in 0..<7 {
-        let date = Calendar.current.date(byAdding: .day, value: -i, to: today)!
-        let summaryStruct = Summary(
-            id: "preview-news-\(i)",
-            title: "Daily Briefing \(i)",
-            content: "This is a summary of news from \(i) days ago.",
-            createdAt: date,
-            thumbUrl: thumbs[i],
-            sources: [],
-            subjects: i % 2 == 0 ? [.technology] : [.healthAndScience],
-            type: .news
-        )
-
-        let summaryData = SummaryData(
-            id: summaryStruct.id,
-            title: summaryStruct.title,
-            content: summaryStruct.content,
-            createdAt: summaryStruct.createdAt,
-            thumbUrl: summaryStruct.thumbUrl,
-            sources: summaryStruct.sources,
-            subjects: summaryStruct.subjects,
-            type: summaryStruct.type
-        )
-        container.mainContext.insert(summaryData)
-        
-        if i < 3 {
-            let readLaterItem = ReadLaterData(summary: summaryStruct)
-            container.mainContext.insert(readLaterItem)
-        }
-    }
-    
-    let mockStats: [(subject: SummarySubject, count: Int)] = [
-        (.technology, 25),
-        (.economyAndBusiness, 15),
-        (.healthAndScience, 8),
-        (.entertainmentAndCulture, 2)
-    ]
-    
-    for stat in mockStats {
-        let entry = SubjectStatsData(year: currentYear, subject: stat.subject)
-        entry.count = stat.count
-        container.mainContext.insert(entry)
-    }
-    
-    let localRepo = LocalNewsRepository(context: container.mainContext)
-    let cloudRepo = MockNewsDatabaseRepository()
-    let syncService = NewsSyncService(localRepo: localRepo, cloudRepo: cloudRepo)
-    let linkSummaryRepo = GeminiLinkSummaryRepository(apiKey: "")
-    let historyRepo = ReadingHistoryRepository(modelContext: container.mainContext)
-    let readLaterRepo = ReadLaterRepository(modelContext: container.mainContext)
-    let statsRepo = SubjectStatsRepository(modelContext: container.mainContext)
+    let context = preview.container.mainContext
+    let syncService = NewsSyncService(
+        localRepo: LocalNewsRepository(context: context),
+        cloudRepo: MockNewsDatabaseRepository()
+    )
     
     let viewModel = HomeViewModel(
         syncService: syncService,
-        linkSummaryRepo: linkSummaryRepo,
-        historyRepo: historyRepo,
-        readLaterRepo: readLaterRepo,
-        statsRepo: statsRepo
+        linkSummaryRepo: GeminiLinkSummaryRepository(apiKey: ""),
+        historyRepo: ReadingHistoryRepository(modelContext: context),
+        readLaterRepo: ReadLaterRepository(modelContext: context),
+        statsRepo: SubjectStatsRepository(modelContext: context)
     )
     
-    let dummyPrefs = NewsSummaryPreferences(
-        duration: .fast,
-        style: .informal,
-        subjects: [.technology],
-        language: .english,
-        arriveTime: 8
-    )
-    let user = UserProfile(
-        id: "preview_user",
-        firstName: "Preview User",
-        isPremium: true,
-        language: .english,
-        theme: .system,
-        newsPreferences: dummyPrefs
-    )
+    let sessionManager = DependencyFactory.shared.makeSessionManager()
     
-    return (container, viewModel, user, sessionManager)
-}
-
-#Preview {
-    let (container, viewModel, user, sessionManager) = makePreviewDependencies()
-    
-    NavigationStack {
-        HomeView(user: user, viewModel: viewModel)
-            .modelContainer(container)
+    return NavigationStack {
+        HomeView(user: UserProfile.sampleUser, viewModel: viewModel)
+            .modelContainer(preview.container)
             .environment(sessionManager)
     }
 }

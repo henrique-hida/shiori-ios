@@ -29,6 +29,14 @@ enum Language: String, Codable, CaseIterable {
         }
     }
     
+    var voiceIdentifier: String {
+        switch self {
+        case .english: return "en-US"
+        case .portuguese: return "pt-BR"
+        case .spanish: return "es-ES"
+        }
+    }
+    
     static var currentSystemLanguage: Language {
         let code = Locale.preferredLanguages.first ?? "en"
         let prefix = String(code.prefix(2))

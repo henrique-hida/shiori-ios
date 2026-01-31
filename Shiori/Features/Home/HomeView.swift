@@ -11,6 +11,7 @@ import SwiftData
 struct HomeView: View {
     let user: UserProfile
     @State private var viewModel: HomeViewModel
+    @State private var audioViewModel: AudioPlayerViewModel
     
     init(user: UserProfile, viewModel: HomeViewModel? = nil) {
         self.user = user
@@ -21,6 +22,8 @@ struct HomeView: View {
             let vm = DependencyFactory.shared.makeHomeViewModel()
             _viewModel = State(initialValue: vm)
         }
+        
+        _audioViewModel = State(initialValue: DependencyFactory.shared.makeAudioPlayerViewModel())
     }
     
     var body: some View {
@@ -43,9 +46,9 @@ struct HomeView: View {
                             }
                             SearchBar(viewModel: viewModel)
                             if let latestNews = viewModel.weekNewsSummaries.first {
-                                MainCard(viewModel: viewModel, latestNews: latestNews)
+                                MainCard(viewModel: viewModel, audioViewModel: audioViewModel, user: user, latestNews: latestNews)
                             } else {
-                                MainCard(viewModel: viewModel, latestNews: nil)
+                                MainCard(viewModel: viewModel, audioViewModel: audioViewModel, user: user, latestNews: nil)
                             }
                             if viewModel.weekNewsSummaries.count > 1 {
                                 let history = Array(viewModel.weekNewsSummaries.dropFirst())
@@ -74,7 +77,7 @@ struct HomeView: View {
             }
         }
         .navigationDestination(item: $viewModel.selectedSummary) { article in
-            ArticlesView(summary: article, user: user)
+            ArticlesView(summary: article, user: user, audioViewModel: audioViewModel)
         }
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -98,6 +101,11 @@ struct HomeView: View {
         .sheet(isPresented: $viewModel.shouldShowLinkSummarySettings) {
             LinkSummarySettings(viewModel: viewModel)
                 .presentationDetents([.height(400)])
+        }
+        .safeAreaInset(edge: .bottom) {
+            if let summary = viewModel.weekNewsSummaries.first, audioViewModel.isPlaying(summaryId: summary.id) {
+                AudioPlayerView(vm: audioViewModel, summary: summary, user: user)
+            }
         }
     }
 }
@@ -140,6 +148,8 @@ private struct SearchBar: View {
 
 private struct MainCard: View {
     @Bindable var viewModel: HomeViewModel
+    var audioViewModel: AudioPlayerViewModel
+    var user: UserProfile
     var latestNews: Summary?
     var latestNewsDate: String {
         latestNews?.createdAt.formatted(.dateTime.day().month()) ?? "--/--"
@@ -160,12 +170,14 @@ private struct MainCard: View {
             Spacer()
             
             Button {
-                viewModel.handlePlayButtonClick()
+                if let summary = latestNews {
+                    audioViewModel.toggleAudio(summary: summary, language: user.newsPreferences.language)
+                }
             } label: {
                 Circle()
                     .frame(width: 50, height: 50)
                     .overlay(
-                        Image(systemName: viewModel.isPlayingLastNews ? "pause.fill" : "play.fill")
+                        Image(systemName: (latestNews != nil && audioViewModel.isPlaying(summaryId: latestNews!.id)) ? "pause.fill" : "play.fill")
                             .foregroundStyle(.accentPrimary)
                     )
                     .foregroundStyle(.accentButton)

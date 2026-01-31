@@ -10,9 +10,10 @@ import Foundation
 protocol AudioServiceProtocol {
     var isPlaying: Bool { get }
     var isPaused: Bool { get }
-    var speechRate: Float { get set }
+    var currentPlayingId: String? { get }
+    var onStateChange: (() -> Void)? { get set }
     
-    func play(text: String, language: String)
+    func play(text: String, id: String, language: String)
     func pause()
     func stop()
 }

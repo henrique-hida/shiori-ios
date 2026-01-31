@@ -27,13 +27,14 @@ private struct UnrealResponse: Codable {
 @Observable
 final class UnrealAudioService: NSObject, AudioServiceProtocol, AVAudioPlayerDelegate {
     private let apiKey: String
-    
     init (apiKey: String) {
         self.apiKey = apiKey
     }
     
     var isPlaying: Bool = false
     var isPaused: Bool = false
+    var currentPlayingId: String?
+    var onStateChange: (() -> Void)?
     
     var speechRate: Float = 1.0 {
         didSet {
@@ -45,7 +46,7 @@ final class UnrealAudioService: NSObject, AudioServiceProtocol, AVAudioPlayerDel
     private var currentTask: Task<Void, Never>?
     private let defaultVoice = "Scarlett"
     
-    func play(text: String, language: String) {
+    func play(text: String, id: String, language: String) {
         if isPaused, let player = audioPlayer {
             player.play()
             updateState()

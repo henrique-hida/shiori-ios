@@ -6,12 +6,12 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ArticlesView: View {
     var summary: Summary
     var user: UserProfile
-    var viewModel: ArticlesViewModel = DependencyFactory.shared.makeArticlesViewModel()
-        
+    var audioViewModel: AudioPlayerViewModel
     var body: some View {
         ZStack {
             // background
@@ -44,7 +44,7 @@ struct ArticlesView: View {
         .padding(20)
         .frame(maxWidth: .infinity, alignment: .topLeading)
         .safeAreaInset(edge: .bottom) {
-            AudioPlayer(viewModel: viewModel, summary: summary, user: user)
+            AudioPlayerView(vm: audioViewModel, summary: summary, user: user)
         }
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -64,7 +64,7 @@ struct ArticlesView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .onDisappear {
-            viewModel.cleanup()
+            audioViewModel.cleanup()
         }
     }
     func testDatePrinting() {
@@ -74,162 +74,16 @@ struct ArticlesView: View {
     }
 }
 
-private struct AudioPlayer: View {
-    @Environment(\.dismiss) private var dismiss
-    var viewModel: ArticlesViewModel
-    let summary: Summary
-    let user: UserProfile
-    
-    @State private var progress: Double = 0.3
-    @State private var showSources = false
-    
-    var body: some View {
-        VStack(spacing: 10) {
-            Slider(value: $progress)
-                .tint(.accentPrimary)
-            
-            ZStack(alignment: .center) {
-                HStack(spacing: 30) {
-                    Image(systemName: "10.arrow.trianglehead.counterclockwise")
-                        .font(.system(size: 24))
-                        .foregroundStyle(.accentPrimary)
-                    
-                    Button {
-                        viewModel.toggleAudio(text: summary.content, language: user.newsPreferences.language)
-                    } label: {
-                        Circle()
-                            .overlay(
-                                Image(systemName: viewModel.audioService.isPlaying ? "pause.fill" : "play.fill")
-                                    .font(.system(size: 24))
-                                    .foregroundStyle(.bg)
-                            )
-                            .foregroundStyle(.accentPrimary)
-                            .frame(width: 60)
-                    }
-                    
-                    Image(systemName: "10.arrow.trianglehead.clockwise")
-                        .font(.system(size: 24))
-                        .foregroundStyle(.accentPrimary)
-                }
-                
-                HStack {
-                    Spacer()
-                    
-                    Menu {
-                        Button("Save to read later", systemImage: "bookmark") {
-                            Task {
-                                await viewModel.readLaterRepo.save(summary, user: user)
-                                dismiss()
-                            }
-                        }
-                        
-                        Button("View sources", systemImage: "link") {
-                            showSources = true
-                        }
-                    } label: {
-                        Image(systemName: "ellipsis")
-                            .foregroundStyle(.textMuted)
-                    }
-                }
-            }
-        }
-        .padding(.horizontal, 20)
-        .background(.ultraThinMaterial)
-        .sheet(isPresented: $showSources) {
-            SourcesSheet(sources: summary.sources)
-                .presentationDetents([.medium, .large])
-                .presentationDragIndicator(.visible)
-        }
-    }
-}
-
-private struct SourcesSheet: View {
-    let sources: [String]
-    @Environment(\.dismiss) private var dismiss
-    
-    var body: some View {
-        NavigationStack {
-            List {
-                if sources.isEmpty {
-                    Text("No sources available")
-                        .foregroundStyle(.textMuted)
-                } else {
-                    ForEach(sources, id: \.self) { urlString in
-                        if let url = URL(string: urlString) {
-                            Link(destination: url) {
-                                HStack(spacing: 10) {
-                                    Image(systemName: "safari")
-                                        .foregroundStyle(.accentPrimary)
-                                    
-                                    VStack(alignment: .leading) {
-                                        Text(url.host() ?? urlString)
-                                            .foregroundStyle(.textPrimary)
-                                            .font(.headline)
-                                        
-                                        Text("Click to read the original article")
-                                            .foregroundStyle(.textMuted)
-                                            .font(.caption)
-                                            .lineLimit(1)
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    Image(systemName: "arrow.up.right")
-                                        .font(.caption)
-                                        .foregroundStyle(.accentPrimary)
-                                }
-                                .padding(.vertical, 4)
-                            }
-                            .listRowBackground(Color.bgLight)
-                        }
-                    }
-                }
-            }
-            .shadow(color: .black.opacity(0.05), radius: 1, y: 3)
-            .navigationTitle("Sources")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark")
-                            .foregroundStyle(.textMuted)
-                    }
-                }
-            }
-        }
-    }
-}
-
 #Preview {
-    let summary = Summary(
-        id: "mock-1",
-        title: "CNH 2026: veja como renovar a habilitação automaticamente e de graça",
-        content: "Para ser considerado bom condutor, o motorista precisa cumprir os seguintes critérios: 🪪 Não ter pontos registrados na CNH nos últimos 12 meses; 🚨 Não ter infrações de trânsito registradas no documento no mesmo período; 📝 Estar cadastrado no Registro Nacional Positivo de Condutores (RNPC). Para aderir ao RNPC e ter a CNH renovada de graça, o motorista deve: Abrir o aplicativo CNH Brasil; Selecionar a opção “Condutor”; Acessar Cadastro Positivo; Tocar em Autorizar participação.",
-        createdAt: Date(),
-        thumbUrl: "https://s2-g1.glbimg.com/6Z1wTV5tuVFG9LHWQMUm_ibdw1Y=/0x57:1280x777/1080x608/smart/filters:max_age(3600)/https://i.s3.glbimg.com/v1/AUTH_59edd422c0c84a879bd37670ae4f538a/internal_photos/bs/2025/G/e/Jn2qE3RrK1oXg1cKsxDg/design-sem-nome.jpg",
-        sources: ["https://g1.globo.com/carros/noticia/2026/01/10/cnh-2026-veja-como-renovar-a-habilitacao-automaticamente-e-de-graca.ghtml", "https://g1.globo.com/pe/pernambuco/blog/viver-noronha/post/2026/01/10/advogada-mordida-por-tubarao-em-fernando-de-noronha-relata-senti-forte-mordida-na-perna.ghtml"],
-        subjects: [.economyAndBusiness, .entertainmentAndCulture],
-        type: .news
-    )
+    let summary = Summary.sampleSummaries[0].summaryRaw
+    let user = UserProfile.sampleUser
     
-    let dummyUser = UserProfile(
-        id: "preview_user",
-        firstName: "Previewer",
-        isPremium: true,
-        language: .english,
-        theme: .system,
-        newsPreferences: NewsSummaryPreferences(
-            duration: .standard,
-            style: .funny,
-            subjects: [],
-            language: .english,
-            arriveTime: 8
-        )
-    )
+    let preview = Preview()
+    preview.addExamples(ReadLaterData.sampleReadLater)
+    let readLaterRepo = ReadLaterRepository(modelContext: preview.container.mainContext)
+    let audioPlayerViewModel = AudioPlayerViewModel(audioService: AVFAudioService(), readLaterRepo: readLaterRepo)
     
-    NavigationStack {
-        ArticlesView(summary: summary, user: dummyUser)
+    return NavigationStack {
+        ArticlesView(summary: summary, user: user, audioViewModel: audioPlayerViewModel)
     }
 }

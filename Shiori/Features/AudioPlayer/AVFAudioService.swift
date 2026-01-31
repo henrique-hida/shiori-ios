@@ -15,49 +15,62 @@ final class AVFAudioService: NSObject, AudioServiceProtocol, AVSpeechSynthesizer
     
     var isPlaying: Bool = false
     var isPaused: Bool = false
-    var speechRate: Float = AVSpeechUtteranceDefaultSpeechRate
+    var currentPlayingId: String? = nil
+    var onStateChange: (() -> Void)?
     
     override init() {
         super.init()
         synthesizer.delegate = self
+        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio, options: [.duckOthers])
     }
     
-    func play(text: String, language: String = "pt-BR") {
-        if synthesizer.isPaused {
+    func play(text: String, id: String, language: String = "en-US") {
+        let session = AVAudioSession.sharedInstance()
+
+        if synthesizer.isPaused && currentPlayingId == id {
+            try? session.setActive(true)
             synthesizer.continueSpeaking()
-            updateState()
+            isPlaying = true
+            isPaused = false
+            onStateChange?()
             return
         }
-        
+
         if synthesizer.isSpeaking {
             synthesizer.stopSpeaking(at: .immediate)
         }
-        
-        let utterance = AVSpeechUtterance(string: text)
-        utterance.voice = AVSpeechSynthesisVoice(language: language)
-        utterance.rate = speechRate
-        
+
         do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio)
-            try AVAudioSession.sharedInstance().setActive(true)
+            try session.setActive(true)
+
+            let utterance = AVSpeechUtterance(string: text)
+            utterance.voice = AVSpeechSynthesisVoice(language: language)
+
+            currentPlayingId = id
+            synthesizer.speak(utterance)
+            isPlaying = true
+            isPaused = false
+            onStateChange?()
         } catch {
-            print("Erro ao configurar sessão de áudio: \(error)")
+            print("Session error: \(error)")
         }
-        
-        synthesizer.speak(utterance)
-        updateState()
     }
-    
+
     func pause() {
         if synthesizer.isSpeaking {
-            synthesizer.pauseSpeaking(at: .immediate)
-            updateState()
+            synthesizer.pauseSpeaking(at: .word)
+            isPlaying = false
+            isPaused = true
+            onStateChange?()
         }
     }
-    
+
     func stop() {
         synthesizer.stopSpeaking(at: .immediate)
-        updateState()
+        currentPlayingId = nil
+        isPlaying = false
+        isPaused = false
+        onStateChange?()
     }
     
     nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didStart utterance: AVSpeechUtterance) {
@@ -82,5 +95,6 @@ final class AVFAudioService: NSObject, AudioServiceProtocol, AVSpeechSynthesizer
     private func updateState() {
         self.isPlaying = synthesizer.isSpeaking && !synthesizer.isPaused
         self.isPaused = synthesizer.isPaused
+        onStateChange?()
     }
 }

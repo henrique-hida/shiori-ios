@@ -18,6 +18,7 @@ final class DependencyFactory {
     private let historyRepo: ReadingHistoryRepositoryProtocol
     private let readLaterRepo: ReadLaterRepositoryProtocol
     private let statsRepo: SubjectStatsRepositoryProtocol
+    private let audioService: AudioServiceProtocol
     
     private init() {
         let dbContext = DatabaseProvider.shared.container.mainContext
@@ -28,10 +29,14 @@ final class DependencyFactory {
         self.historyRepo = ReadingHistoryRepository(modelContext: dbContext)
         self.readLaterRepo = ReadLaterRepository(modelContext: dbContext)
         self.statsRepo = SubjectStatsRepository(modelContext: dbContext)
+        self.audioService = AVFAudioService() // UnrealAudioService(apiKey: Bundle.main.unrealApiKey)
     }
     
     func makeSessionManager() -> SessionManager {
-        return SessionManager(authRepo: authRepo, userRepo: userRepo)
+        return SessionManager(
+            authRepo: authRepo,
+            userRepo: userRepo
+        )
     }
     
     func makeSignInViewModel() -> SignInViewModel {
@@ -39,32 +44,33 @@ final class DependencyFactory {
     }
     
     func makeSignUpViewModel() -> SignUpViewModel {
-        return SignUpViewModel(authRepo: authRepo, userRepo: userRepo)
+        return SignUpViewModel(
+            authRepo: authRepo,
+            userRepo: userRepo
+        )
     }
     
     func makeHomeViewModel() -> HomeViewModel {
-        let service = makeNewsSyncService()
-        let linkSummaryRepo = GeminiLinkSummaryRepository(apiKey: Bundle.main.geminiApiKey)
-        return HomeViewModel(
-            syncService: service,
-            linkSummaryRepo: linkSummaryRepo,
+        HomeViewModel(
+            syncService: makeNewsSyncService(),
+            linkSummaryRepo: GeminiLinkSummaryRepository(apiKey: Bundle.main.geminiApiKey),
             historyRepo: historyRepo,
             readLaterRepo: readLaterRepo,
             statsRepo: statsRepo
         )
     }
     
-    func makeArticlesViewModel() -> ArticlesViewModel {
-        let audioService = AVFAudioService()
-        //let audioService = UnrealAudioService(apiKey: Bundle.main.unrealApiKey)
-        return ArticlesViewModel(readLaterRepo: readLaterRepo, audioService: audioService)
+    func makeAudioPlayerViewModel() -> AudioPlayerViewModel {
+        AudioPlayerViewModel(
+            audioService: audioService,
+            readLaterRepo: readLaterRepo
+        )
     }
     
     func makeNewsSyncService() -> NewsSyncService {
-        let cloudRepo = FirestoreNewsRepository()
-        return NewsSyncService(
+        NewsSyncService(
             localRepo: localNewsRepo,
-            cloudRepo: cloudRepo
+            cloudRepo: FirestoreNewsRepository()
         )
     }
 }

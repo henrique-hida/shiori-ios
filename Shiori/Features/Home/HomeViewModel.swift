@@ -21,7 +21,6 @@ final class HomeViewModel {
     var linkSummaryStyle: SummaryStyle = .informal
     var linkSummaryDuration: SummaryDuration = .standard
     var shouldShowLinkSummarySettings: Bool = false
-    var isPlayingLastNews: Bool = false
     
     var currentWeekStreak: [String: Bool] = [:]
     var currentWeekDates: [Date] = []
@@ -39,7 +38,7 @@ final class HomeViewModel {
         linkSummaryRepo: LinkSummaryRepositoryProtocol,
         historyRepo: ReadingHistoryRepositoryProtocol,
         readLaterRepo: ReadLaterRepositoryProtocol,
-        statsRepo: SubjectStatsRepositoryProtocol
+        statsRepo: SubjectStatsRepositoryProtocol,
     ){
         self.syncService = syncService
         self.linkSummaryRepo = linkSummaryRepo
@@ -108,10 +107,6 @@ final class HomeViewModel {
     
     enum ValidationError: Error {
         case invalidFormat
-    }
-    
-    func handlePlayButtonClick() {
-        isPlayingLastNews.toggle()
     }
     
     func generateCurrentWeek() {

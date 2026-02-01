@@ -82,11 +82,10 @@ class FirestoreNewsRepository: CloudNewsRepositoryProtocol {
     private func createSummary(from parts: [SubjectPart], dateStr: String, preferences: NewsSummaryPreferences) -> Summary {
         let aggregatedContent = parts.map { part in
             """
-            ## \(part.category.uppercased())
-            ### \(part.title)
+            ** \(part.category.uppercased()): \(part.title) **
             \(part.content)
             """
-        }.joined(separator: "\n\n---\n\n")
+        }.joined(separator: "\n\n")
         
         let allSources = Array(Set(parts.flatMap { $0.sources })).sorted()
         let mainThumbUrl = parts.first { !$0.thumbUrl.isEmpty }?.thumbUrl ?? ""

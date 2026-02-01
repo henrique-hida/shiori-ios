@@ -36,7 +36,7 @@ struct ArticlesView: View {
                         RoundedRectangle(cornerRadius: 20)
                     )
                     
-                    Text(summary.content)
+                    Text(.init(summary.content))
                         .textSmall()
                 }
             }

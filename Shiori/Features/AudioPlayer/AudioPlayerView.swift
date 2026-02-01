@@ -19,8 +19,23 @@ struct AudioPlayerView: View {
     
     var body: some View {
         VStack(spacing: 10) {
-            Slider(value: $progress)
-                .tint(.accentPrimary)
+            Slider(
+                value: Binding(
+                    get: { vm.progress },
+                    set: { newValue in
+                        vm.progress = newValue
+                    }
+                ),
+                in: 0...1,
+                onEditingChanged: { editing in
+                    vm.isDraggingSlider = editing
+                    if !editing {
+                        vm.seek(to: vm.progress)
+                    }
+                }
+            )
+            .animation(.linear(duration: 0.3), value: vm.progress)
+            .tint(.accentPrimary)
             
             ZStack(alignment: .center) {
                 HStack(spacing: 30) {
@@ -68,7 +83,7 @@ struct AudioPlayerView: View {
             }
         }
         .padding(.horizontal, 20)
-        .padding(.vertical)
+        .padding(.top)
         .background(.ultraThinMaterial)
         .sheet(isPresented: $showSources) {
             SourcesSheet(sources: summary.sources)

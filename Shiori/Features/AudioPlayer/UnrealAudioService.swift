@@ -26,6 +26,12 @@ private struct UnrealResponse: Codable {
 @MainActor
 @Observable
 final class UnrealAudioService: NSObject, AudioServiceProtocol, AVAudioPlayerDelegate {
+    var progress: Double = 0.0
+    
+    func seek(to percentage: Double) {
+        
+    }
+    
     private let apiKey: String
     init (apiKey: String) {
         self.apiKey = apiKey

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 @Observable
 final class AudioPlayerViewModel {
@@ -14,15 +15,26 @@ final class AudioPlayerViewModel {
     
     var isAudioPlaying: Bool = false
     var currentAudioId: String? = nil
+    var progress: Double = 0.0
+    var isDraggingSlider: Bool = false
     
     init(audioService: AudioServiceProtocol, readLaterRepo: ReadLaterRepositoryProtocol) {
         self.audioService = audioService
         self.readLaterRepo = readLaterRepo
         
         self.audioService.onStateChange = { [weak self] in
-            self?.isAudioPlaying = self?.audioService.isPlaying ?? false
-            self?.currentAudioId = self?.audioService.currentPlayingId
+            guard let self = self else { return }
+            self.isAudioPlaying = self.audioService.isPlaying
+            self.currentAudioId = self.audioService.currentPlayingId
+            
+            if !self.isDraggingSlider {
+                self.progress = self.audioService.progress
+            }
         }
+    }
+    
+    func seek(to value: Double) {
+        audioService.seek(to: value)
     }
     
     func isPlaying(summaryId: String) -> Bool {

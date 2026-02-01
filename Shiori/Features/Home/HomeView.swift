@@ -77,7 +77,13 @@ struct HomeView: View {
             }
         }
         .navigationDestination(item: $viewModel.selectedSummary) { article in
-            ArticlesView(summary: article, user: user, audioViewModel: audioViewModel)
+            let isLatest = viewModel.weekNewsSummaries.first?.id == article.id
+            ArticlesView(
+                summary: article,
+                user: user,
+                audioViewModel: audioViewModel,
+                isLatest: isLatest
+            )
         }
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -101,11 +107,6 @@ struct HomeView: View {
         .sheet(isPresented: $viewModel.shouldShowLinkSummarySettings) {
             LinkSummarySettings(viewModel: viewModel)
                 .presentationDetents([.height(400)])
-        }
-        .safeAreaInset(edge: .bottom) {
-            if let summary = viewModel.weekNewsSummaries.first, audioViewModel.isPlaying(summaryId: summary.id) {
-                AudioPlayerView(vm: audioViewModel, summary: summary, user: user)
-            }
         }
     }
 }
@@ -154,6 +155,10 @@ private struct MainCard: View {
     var latestNewsDate: String {
         latestNews?.createdAt.formatted(.dateTime.day().month()) ?? "--/--"
     }
+    var isCurrentAudio: Bool {
+        guard let news = latestNews else { return false }
+        return audioViewModel.currentAudioId == news.id
+    }
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -169,19 +174,42 @@ private struct MainCard: View {
             
             Spacer()
             
-            Button {
-                if let summary = latestNews {
-                    audioViewModel.toggleAudio(summary: summary, language: user.newsPreferences.language)
+            HStack {
+                Button {
+                    if let summary = latestNews {
+                        audioViewModel.toggleAudio(summary: summary, language: user.newsPreferences.language)
+                    }
+                } label: {
+                    Circle()
+                        .frame(width: 50, height: 50)
+                        .overlay(
+                            Image(systemName: (latestNews != nil && audioViewModel.isPlaying(summaryId: latestNews!.id)) ? "pause.fill" : "play.fill")
+                                .foregroundStyle(.accentPrimary)
+                        )
+                        .foregroundStyle(.accentButton)
                 }
-            } label: {
-                Circle()
-                    .frame(width: 50, height: 50)
-                    .overlay(
-                        Image(systemName: (latestNews != nil && audioViewModel.isPlaying(summaryId: latestNews!.id)) ? "pause.fill" : "play.fill")
-                            .foregroundStyle(.accentPrimary)
+                
+                if isCurrentAudio {
+                    Slider(
+                        value: Binding(
+                            get: { audioViewModel.progress },
+                            set: { newValue in
+                                audioViewModel.progress = newValue
+                            }
+                        ),
+                        in: 0...1,
+                        onEditingChanged: { editing in
+                            audioViewModel.isDraggingSlider = editing
+                            if !editing {
+                                audioViewModel.seek(to: audioViewModel.progress)
+                            }
+                        }
                     )
-                    .foregroundStyle(.accentButton)
+                    .tint(.accentButton)
+                    .transition(.opacity)
+                }
             }
+            .animation(.easeInOut(duration: 0.3), value: isCurrentAudio)
             
         }
         .frame(height: 140, alignment: .top)

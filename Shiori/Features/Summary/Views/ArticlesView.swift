@@ -12,6 +12,8 @@ struct ArticlesView: View {
     var summary: Summary
     var user: UserProfile
     var audioViewModel: AudioPlayerViewModel
+    var isLatest: Bool
+    
     var body: some View {
         ZStack {
             // background
@@ -64,7 +66,9 @@ struct ArticlesView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .onDisappear {
-            audioViewModel.cleanup()
+            if !isLatest {
+                audioViewModel.cleanup()
+            }
         }
     }
     func testDatePrinting() {
@@ -84,6 +88,6 @@ struct ArticlesView: View {
     let audioPlayerViewModel = AudioPlayerViewModel(audioService: AVFAudioService(), readLaterRepo: readLaterRepo)
     
     return NavigationStack {
-        ArticlesView(summary: summary, user: user, audioViewModel: audioPlayerViewModel)
+        ArticlesView(summary: summary, user: user, audioViewModel: audioPlayerViewModel, isLatest: true)
     }
 }

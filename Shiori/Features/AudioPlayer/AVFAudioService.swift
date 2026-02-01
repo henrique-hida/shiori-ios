@@ -122,8 +122,11 @@ final class AVFAudioService: NSObject, AudioServiceProtocol, AVSpeechSynthesizer
         Task { @MainActor in
             if progress > 0.95 {
                 try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+                currentPlayingId = nil
+                fullText = ""
+                playedOffset = 0
+                progress = 0.0
                 updateState(playing: false, paused: false)
-                progress = 1.0
             }
         }
     }

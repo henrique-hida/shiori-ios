@@ -7,7 +7,11 @@
 
 import Foundation
 
-class GeminiLinkSummaryRepository: LinkSummaryRepositoryProtocol {
+protocol LinkSummaryRepositoryProtocol {
+    func summarizeLink(url: URL, style: SummaryStyle, duration: SummaryDuration) async throws -> Summary
+}
+
+final class GeminiLinkSummaryRepository: LinkSummaryRepositoryProtocol {
     private let apiKey: String
     private let modelName: String = "gemini-2.5-flash"
     

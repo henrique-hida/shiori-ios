@@ -96,7 +96,7 @@ struct HomeView: View {
             
             ToolbarItem(placement: .topBarTrailing) {
                 Button(action: {
-                    print("Menu tapped")
+                    viewModel.shouldShowHistorySheet = true
                 }) {
                     Image(systemName: "line.3.horizontal")
                         .foregroundStyle(.primary)
@@ -105,8 +105,12 @@ struct HomeView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $viewModel.shouldShowLinkSummarySettings) {
-            LinkSummarySettings(viewModel: viewModel)
+            LinkSummarySettings(viewModel: viewModel, user: user)
                 .presentationDetents([.height(400)])
+        }
+        .sheet(isPresented: $viewModel.shouldShowHistorySheet) {
+            HistorySheet(viewModel: viewModel, user: user)
+                .presentationDetents([.large])
         }
     }
 }
@@ -477,45 +481,6 @@ private struct Dashboard: View {
     }
 }
 
-private struct LinkSummarySettings: View {
-    @Environment(\.dismiss) private var dismiss
-    @Bindable var viewModel: HomeViewModel
-    
-    var body: some View {
-        NavigationStack {
-            VStack(spacing: 20) {
-                VStack(spacing: 15) {
-                    ShioriSelector(title: "Select a style", icon: "newspaper", options: SummaryStyle.allCases, selection: $viewModel.linkSummaryStyle)
-                    
-                    ShioriSelector(title: "Select a duration", icon: "clock", options: SummaryDuration.allCases, selection: $viewModel.linkSummaryDuration)
-                    
-                }
-                ShioriButton(title: "Generate summary", style: .primary) {
-                    Task {
-                        if let url = viewModel.validUrl {
-                            await viewModel.search(url: url)
-                        }
-                    }
-                }
-            }
-            .padding(20)
-            .padding(.top, 0)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark")
-                            .foregroundStyle(.textMuted)
-                    }
-                }
-            }
-            .navigationTitle("Custom your summary")
-            .navigationBarTitleDisplayMode(.inline)
-        }
-    }
-}
-
 #Preview {
     let preview = Preview(SummaryData.self, ReadLaterData.self, SubjectStatsData.self)
     preview.addExamples(Summary.sampleSummaries)
@@ -531,6 +496,8 @@ private struct LinkSummarySettings: View {
     let viewModel = HomeViewModel(
         syncService: syncService,
         linkSummaryRepo: GeminiLinkSummaryRepository(apiKey: ""),
+        cloudLinkPersistence: MockLinkSummaryRepository(),
+        cloudNewsRepo: MockNewsDatabaseRepository(),
         historyRepo: ReadingHistoryRepository(modelContext: context),
         readLaterRepo: ReadLaterRepository(modelContext: context),
         statsRepo: SubjectStatsRepository(modelContext: context)

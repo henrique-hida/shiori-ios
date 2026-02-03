@@ -8,6 +8,11 @@
 import Foundation
 import SwiftData
 
+protocol SubjectStatsRepositoryProtocol {
+    func increment(subjects: [SummarySubject]) async
+    func getYearlyStats(year: Int) async -> [(subject: SummarySubject, percentage: Double)]
+}
+
 @MainActor
 final class SubjectStatsRepository: SubjectStatsRepositoryProtocol {
     private let modelContext: ModelContext

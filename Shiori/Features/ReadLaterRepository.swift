@@ -9,6 +9,13 @@ import Foundation
 import SwiftData
 import FirebaseFirestore
 
+protocol ReadLaterRepositoryProtocol {
+    func getAll() async -> [ReadLater]
+    func save(_ summary: Summary, user: UserProfile) async
+    func remove(id: String, user: UserProfile) async
+    func isSaved(id: String) -> Bool
+}
+
 final class ReadLaterRepository: ReadLaterRepositoryProtocol {
     private let modelContext: ModelContext
     private let db = Firestore.firestore()

@@ -8,22 +8,27 @@
 import Foundation
 import FirebaseFirestore
 
-class FirestoreNewsRepository: CloudNewsRepositoryProtocol {
+protocol CloudNewsRepositoryProtocol {
+    func getNews(for date: Date, preferences: NewsSummaryPreferences) async throws -> Summary
+    func getPreviousNewsBatch(from startDate: Date, count: Int, preferences: NewsSummaryPreferences) async throws -> [Summary]
+}
+
+final class FirestoreNewsRepository: CloudNewsRepositoryProtocol {
     private let db = Firestore.firestore()
     
-    func getTodayNews(preferences: NewsSummaryPreferences) async throws -> Summary {
-        let todayStr = Date.now.formatted(.iso8601.year().month().day().dateSeparator(.dash))
+    func getNews(for date: Date, preferences: NewsSummaryPreferences) async throws -> Summary {
+        let dateStr = date.formatted(.iso8601.year().month().day().dateSeparator(.dash))
         
         let parts = try await fetchAllSubjects(
-            dateStr: todayStr,
+            dateStr: dateStr,
             preferences: preferences
         )
         
         guard !parts.isEmpty else {
-            throw NSError(domain: "Shiori", code: 404, userInfo: [NSLocalizedDescriptionKey: "No news found for today."])
+            throw NSError(domain: "Shiori", code: 404, userInfo: [NSLocalizedDescriptionKey: "No news found for \(dateStr)."])
         }
         
-        return createSummary(from: parts, dateStr: todayStr, preferences: preferences)
+        return createSummary(from: parts, dateStr: dateStr, originalDate: date, preferences: preferences)
     }
     
     private func fetchAllSubjects(dateStr: String, preferences: NewsSummaryPreferences) async throws -> [SubjectPart] {
@@ -65,7 +70,7 @@ class FirestoreNewsRepository: CloudNewsRepositoryProtocol {
         guard let langData = newsDoc.content[lang],
               let styleData = langData.styles[style],
               let finalContent = styleData.durations[duration] else {
-            print("⚠️ Missing content for \(subject.firestoreID) (Lang: \(lang), Style: \(style))")
+            print("⚠️ Missing content for \(subject.firestoreID)")
             return nil
         }
         
@@ -79,10 +84,10 @@ class FirestoreNewsRepository: CloudNewsRepositoryProtocol {
         )
     }
     
-    private func createSummary(from parts: [SubjectPart], dateStr: String, preferences: NewsSummaryPreferences) -> Summary {
+    private func createSummary(from parts: [SubjectPart], dateStr: String, originalDate: Date, preferences: NewsSummaryPreferences) -> Summary {
         let aggregatedContent = parts.map { part in
             """
-            ** \(part.category.uppercased()): \(part.title) **
+            **\(part.category.uppercased()): \(part.title)**
             \(part.content)
             """
         }.joined(separator: "\n\n")
@@ -94,12 +99,41 @@ class FirestoreNewsRepository: CloudNewsRepositoryProtocol {
             id: "daily-\(dateStr)",
             title: "Daily Briefing: \(dateStr)",
             content: aggregatedContent,
-            createdAt: Date(),
+            createdAt: originalDate,
             thumbUrl: mainThumbUrl,
             sources: allSources,
             subjects: parts.map { $0.subjectType },
             type: .news
         )
+    }
+    
+    func getPreviousNewsBatch(
+        from startDate: Date,
+        count: Int,
+        preferences: NewsSummaryPreferences
+    ) async throws -> [Summary] {
+        
+        let calendar = Calendar.current
+        let datesToFetch = (1...count).compactMap { i in
+            calendar.date(byAdding: .day, value: -i, to: startDate)
+        }
+        
+        return await withTaskGroup(of: Summary?.self) { group in
+            for date in datesToFetch {
+                group.addTask {
+                    return try? await self.getNews(for: date, preferences: preferences)
+                }
+            }
+            
+            var results: [Summary] = []
+            for await summary in group {
+                if let summary = summary {
+                    results.append(summary)
+                }
+            }
+            
+            return results.sorted { $0.createdAt > $1.createdAt }
+        }
     }
 }
 

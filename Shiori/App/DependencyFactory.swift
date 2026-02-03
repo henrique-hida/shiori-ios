@@ -15,6 +15,9 @@ final class DependencyFactory {
     private let authRepo: AuthRepositoryProtocol
     private let userRepo: UserRepositoryProtocol
     private let localNewsRepo: LocalNewsRepositoryProtocol
+    private let cloudNewsRepo: CloudNewsRepositoryProtocol
+    private let linkSummaryRepo: LinkSummaryRepositoryProtocol
+    private let cloudLinkPersistenceRepo: LinkSummaryPersistenceProtocol
     private let historyRepo: ReadingHistoryRepositoryProtocol
     private let readLaterRepo: ReadLaterRepositoryProtocol
     private let statsRepo: SubjectStatsRepositoryProtocol
@@ -26,6 +29,9 @@ final class DependencyFactory {
         self.authRepo = FirebaseAuthRepository()
         self.userRepo = FirestoreUserRepository()
         self.localNewsRepo = LocalNewsRepository(context: dbContext)
+        self.cloudNewsRepo = FirestoreNewsRepository()
+        self.linkSummaryRepo = GeminiLinkSummaryRepository(apiKey: Bundle.main.geminiApiKey)
+        self.cloudLinkPersistenceRepo = FirestoreLinkSummaryRepository()
         self.historyRepo = ReadingHistoryRepository(modelContext: dbContext)
         self.readLaterRepo = ReadLaterRepository(modelContext: dbContext)
         self.statsRepo = SubjectStatsRepository(modelContext: dbContext)
@@ -53,7 +59,9 @@ final class DependencyFactory {
     func makeHomeViewModel() -> HomeViewModel {
         HomeViewModel(
             syncService: makeNewsSyncService(),
-            linkSummaryRepo: GeminiLinkSummaryRepository(apiKey: Bundle.main.geminiApiKey),
+            linkSummaryRepo: linkSummaryRepo,
+            cloudLinkPersistence: cloudLinkPersistenceRepo,
+            cloudNewsRepo: cloudNewsRepo,
             historyRepo: historyRepo,
             readLaterRepo: readLaterRepo,
             statsRepo: statsRepo
@@ -70,7 +78,7 @@ final class DependencyFactory {
     func makeNewsSyncService() -> NewsSyncService {
         NewsSyncService(
             localRepo: localNewsRepo,
-            cloudRepo: FirestoreNewsRepository()
+            cloudRepo: cloudNewsRepo
         )
     }
 }

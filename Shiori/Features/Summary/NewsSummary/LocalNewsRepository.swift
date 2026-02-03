@@ -8,6 +8,12 @@
 import Foundation
 import SwiftData
 
+protocol LocalNewsRepositoryProtocol {
+    func saveNews(_ summaries: Summary) async throws -> Void
+    func fetchNews(forDate date: Date) throws -> Summary?
+    func fetchWeekNews() throws -> [Summary]
+}
+
 @MainActor
 final class LocalNewsRepository: LocalNewsRepositoryProtocol {
     private let context: ModelContext

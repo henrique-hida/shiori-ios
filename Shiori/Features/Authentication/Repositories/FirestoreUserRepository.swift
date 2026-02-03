@@ -8,6 +8,11 @@
 import Foundation
 import FirebaseFirestore
 
+protocol UserRepositoryProtocol {
+    func save(_ user: UserProfile) async throws
+    func fetchUser(id: String) async throws -> UserProfile?
+}
+
 struct FirestoreUserRepository: UserRepositoryProtocol {
     private let db = Firestore.firestore()
     

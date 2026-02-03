@@ -19,6 +19,15 @@ struct AuthDataResult {
     }
 }
 
+protocol AuthRepositoryProtocol {
+    var authStatePublisher: AnyPublisher<String?, Never> { get }
+    
+    func signUp(_ email: String, _ password: String) async throws -> String
+    func signIn(_ email: String, _ password: String) async throws
+    func signOut() throws
+    func deleteCurrentUser() async throws
+}
+
 final class FirebaseAuthRepository: AuthRepositoryProtocol {
     private let authStateSubject = CurrentValueSubject<String?, Never>(Auth.auth().currentUser?.uid)
     private var handle: AuthStateDidChangeListenerHandle?

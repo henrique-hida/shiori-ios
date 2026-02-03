@@ -9,7 +9,12 @@ import Foundation
 import SwiftData
 import FirebaseFirestore
 
-class ReadingHistoryRepository: ReadingHistoryRepositoryProtocol {
+protocol ReadingHistoryRepositoryProtocol {
+    func getHistory(for weekDates: [Date]) async throws -> Set<String>
+    func markTodayAsRead(user: UserProfile) async throws
+}
+
+final class ReadingHistoryRepository: ReadingHistoryRepositoryProtocol {
     private let modelContext: ModelContext
     private let db = Firestore.firestore()
     

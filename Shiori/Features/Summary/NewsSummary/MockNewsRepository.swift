@@ -8,7 +8,14 @@
 import Foundation
 
 final class MockNewsDatabaseRepository: CloudNewsRepositoryProtocol {
-    func getTodayNews(preferences: NewsSummaryPreferences) async throws -> Summary {
+    func getPreviousNewsBatch(from startDate: Date, count: Int, preferences: NewsSummaryPreferences) async throws -> [Summary] {
+        return Summary.sampleSummaries.map{$0.summaryRaw}
+    }
+    
+    func getNews(for date: Date, preferences: NewsSummaryPreferences) async throws -> Summary {
+        if let summary = Summary.sampleSummaries.first?.summaryRaw {
+            return summary
+        }
         return Summary(
             id: "mock-1",
             title: "CNH 2026: veja como renovar a habilitação automaticamente e de graça",

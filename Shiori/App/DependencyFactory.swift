@@ -68,6 +68,14 @@ final class DependencyFactory {
         )
     }
     
+    func makeSettingsViewModel(user: UserProfile, sessionManager: SessionManager) -> SettingsViewModel {
+        return SettingsViewModel(
+            user: user,
+            repository: userRepo,
+            sessionManager: sessionManager
+        )
+    }
+    
     func makeAudioPlayerViewModel() -> AudioPlayerViewModel {
         AudioPlayerViewModel(
             audioService: audioService,

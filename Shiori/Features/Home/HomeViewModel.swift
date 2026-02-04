@@ -20,14 +20,17 @@ final class HomeViewModel {
     var validUrl: URL? = nil
     var linkSummaryStyle: SummaryStyle = .informal
     var linkSummaryDuration: SummaryDuration = .standard
-    var shouldShowLinkSummarySettings: Bool = false
     
     var currentWeekStreak: [String: Bool] = [:]
     var currentWeekDates: [Date] = []
     var readLaterSummaries: [ReadLater] = []
     var subjectStats: [(subject: SummarySubject, percentage: Double)] = []
     
+    var shouldShowLinkSummarySettings: Bool = false
+    var shouldShowSettings: Bool = false
     var shouldShowHistorySheet: Bool = false
+    var historySheetTab: Int = 0
+    
     var cloudHistorySummaries: [Summary] = []
     var linkNewsSummaries: [Summary] = []
     

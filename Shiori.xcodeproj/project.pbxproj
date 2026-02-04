@@ -31,14 +31,15 @@
 		B46E4A712ED02101002BADD9 /* Exceptions for "Shiori" folder in "ShioriTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				"App/GoogleService-Info.plist",
+				"App/Resources/GoogleService-Info.plist",
 			);
 			target = B44B010B2EBE7BDE00CE96EE /* ShioriTests */;
 		};
-		B4DFE8A42EC2665F00CC0516 /* Exceptions for "Shiori" folder in "Shiori" target */ = {
+		B4A724892F33F05500E4974A /* Exceptions for "Shiori" folder in "Shiori" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				App/Info.plist,
+				App/Configuration/Secrets.xcconfig,
+				App/Resources/Info.plist,
 			);
 			target = B44B00FC2EBE7BDD00CE96EE /* Shiori */;
 		};
@@ -48,7 +49,7 @@
 		B44B00FF2EBE7BDD00CE96EE /* Shiori */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				B4DFE8A42EC2665F00CC0516 /* Exceptions for "Shiori" folder in "Shiori" target */,
+				B4A724892F33F05500E4974A /* Exceptions for "Shiori" folder in "Shiori" target */,
 				B46E4A712ED02101002BADD9 /* Exceptions for "Shiori" folder in "ShioriTests" target */,
 			);
 			path = Shiori;
@@ -373,7 +374,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Shiori/App/Info.plist;
+				INFOPLIST_FILE = Shiori/App/Resources/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Shiori;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.news";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
@@ -420,7 +421,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Shiori/App/Info.plist;
+				INFOPLIST_FILE = Shiori/App/Resources/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Shiori;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.news";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;

@@ -9,6 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct HomeView: View {
+    @Environment(SessionManager.self) private var sessionManager
     let user: UserProfile
     @State private var viewModel: HomeViewModel
     @State private var audioViewModel: AudioPlayerViewModel
@@ -86,6 +87,15 @@ struct HomeView: View {
             )
         }
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    viewModel.shouldShowSettings = true
+                } label: {
+                    Image(systemName: "gearshape")
+                        .foregroundStyle(.primary)
+                }
+            }
+            
             ToolbarItem(placement: .principal) {
                 Image("Isologo")
                     .resizable()
@@ -96,17 +106,27 @@ struct HomeView: View {
             
             ToolbarItem(placement: .topBarTrailing) {
                 Button(action: {
+                    viewModel.historySheetTab = 0
                     viewModel.shouldShowHistorySheet = true
                 }) {
                     Image(systemName: "line.3.horizontal")
                         .foregroundStyle(.primary)
                 }
             }
+            
+            
         }
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $viewModel.shouldShowLinkSummarySettings) {
             LinkSummarySettings(viewModel: viewModel, user: user)
                 .presentationDetents([.height(400)])
+        }
+        .sheet(isPresented: $viewModel.shouldShowSettings) {
+            SettingsView(
+                viewModel: DependencyFactory.shared.makeSettingsViewModel(user: user, sessionManager: sessionManager)
+            )
+            .presentationDetents([.large])
+            .presentationDragIndicator(.hidden)
         }
         .sheet(isPresented: $viewModel.shouldShowHistorySheet) {
             HistorySheet(viewModel: viewModel, user: user)
@@ -395,6 +415,10 @@ private struct ReadLaterView: View {
                     Text("See all")
                         .foregroundStyle(.accentPrimary)
                         .frame(maxWidth: .infinity, alignment: .trailing)
+                        .onTapGesture {
+                            viewModel.historySheetTab = 1
+                            viewModel.shouldShowHistorySheet = true
+                        }
                     
                     Image(systemName: "arrow.forward")
                         .foregroundStyle(.accentPrimary)

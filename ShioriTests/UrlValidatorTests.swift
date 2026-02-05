@@ -34,9 +34,12 @@ struct URLValidationTests {
     private func makeTestViewModel() -> HomeViewModel {
         return HomeViewModel(
             syncService: MockNewsSyncService(),
-            linkSummaryRepo: MockGeminiRepository(),
-            historyRepo: MockHistoryRepository(),
-            readLaterRepo: MockReadLaterRepository()
+            linkSummaryService: MockGeminiService(),
+            cloudLinkPersistence: MockLinkPersistenceService(),
+            cloudNewsService: MockCloudNewsService(),
+            historyService: MockHistoryService(),
+            readLaterService: MockReadLaterService(),
+            statsService: MockStatsService()
         )
     }
 }

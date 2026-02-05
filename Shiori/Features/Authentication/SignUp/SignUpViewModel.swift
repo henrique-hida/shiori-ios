@@ -36,12 +36,12 @@ final class SignUpViewModel {
     var registeredUser: UserProfile? = nil
     
     private let validator: CredentialsValidator = CredentialsValidator()
-    private let authRepo: AuthRepositoryProtocol
-    private let userRepo: UserRepositoryProtocol
+    private let authService: AuthServiceProtocol
+    private let userSource: UserSourceProtocol
     
-    init(authRepo: AuthRepositoryProtocol, userRepo: UserRepositoryProtocol) {
-        self.authRepo = authRepo
-        self.userRepo = userRepo
+    init(authService: AuthServiceProtocol, userSource: UserSourceProtocol) {
+        self.authService = authService
+        self.userSource = userSource
     }
     
     func handleButtonPress() async {
@@ -100,7 +100,7 @@ final class SignUpViewModel {
     }
     
     func signUp() async throws -> UserProfile {
-        let authId = try await authRepo.signUp(email, password)
+        let authId = try await authService.signUp(email, password)
         let newUserProfile = UserProfile(
             id: authId,
             firstName: firstName,
@@ -116,11 +116,11 @@ final class SignUpViewModel {
             )
         )
         do {
-            try await userRepo.save(newUserProfile)
+            try await userSource.save(newUserProfile)
             return newUserProfile
         } catch {
             print("❌ Save Profile failed. Rolling back Auth...")
-            try? await authRepo.deleteCurrentUser()
+            try? await authService.deleteCurrentUser()
             throw error
         }
     }

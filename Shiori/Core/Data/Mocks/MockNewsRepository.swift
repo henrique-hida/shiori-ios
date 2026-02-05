@@ -1,5 +1,5 @@
 //
-//  MockNewsDatabaseRepository.swift
+//  MockNewsDatabaseService.swift
 //  Shiori
 //
 //  Created by Henrique Hida on 12/11/25.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class MockNewsDatabaseRepository: CloudNewsRepositoryProtocol {
+final class MockNetworkNewsSource: NetworkNewsSourceProtocol {
     func getPreviousNewsBatch(from startDate: Date, count: Int, preferences: NewsSummaryPreferences) async throws -> [Summary] {
         return Summary.sampleSummaries.map{$0.summaryRaw}
     }

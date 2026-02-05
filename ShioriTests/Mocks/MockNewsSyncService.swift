@@ -8,7 +8,7 @@
 import Foundation
 @testable import Shiori
 
-struct MockNewsSyncService: NewsSyncServiceProtocol {
+struct MockNewsSyncService: NewsSyncRepositoryProtocol {
     func syncAndLoadWeek(for user: Shiori.UserProfile, isBackgroundTask: Bool) async throws -> [Shiori.Summary] {
         return [Summary(
             id: "preview-news-1",

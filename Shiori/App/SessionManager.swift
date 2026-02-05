@@ -20,18 +20,18 @@ final class SessionManager {
     
     var state: State = .checking
     
-    private let authRepo: AuthRepositoryProtocol
-    private let userRepo: UserRepositoryProtocol
+    private let authService: AuthServiceProtocol
+    private let userSource: UserSourceProtocol
     
-    init(authRepo: AuthRepositoryProtocol, userRepo: UserRepositoryProtocol) {
-        self.authRepo = authRepo
-        self.userRepo = userRepo
+    init(authService: AuthServiceProtocol, userSource: UserSourceProtocol) {
+        self.authService = authService
+        self.userSource = userSource
         self.start()
     }
     
     private func start() {
         Task {
-            for await userId in authRepo.authStatePublisher.values {
+            for await userId in authService.authStatePublisher.values {
                 if let userId {
                     let user = await fetchUserWithRetry(userId: userId)
                     handleStateUpdate(with: user)
@@ -57,7 +57,7 @@ final class SessionManager {
         var attemptsLeft = maxAttempts
         while attemptsLeft > 0 {
             do {
-                if let user = try await userRepo.fetchUser(id: userId) {
+                if let user = try await userSource.fetchUser(id: userId) {
                     print("✅ User Profile loaded: \(user.firstName)")
                     return user
                 } else {
@@ -70,7 +70,7 @@ final class SessionManager {
             }
         }
         print("❌ CRITICAL: Auth exists for \(userId), but Firestore Profile is missing.")
-        try? authRepo.signOut()
+        try? authService.signOut()
         return nil
     }
     
@@ -79,6 +79,6 @@ final class SessionManager {
     }
     
     func signOut() {
-        try? authRepo.signOut()
+        try? authService.signOut()
     }
 }

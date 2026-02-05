@@ -85,7 +85,9 @@ struct ArticlesView: View {
     let preview = Preview()
     preview.addExamples(ReadLaterData.sampleReadLater)
     let readLaterRepo = ReadLaterRepository(modelContext: preview.container.mainContext)
-    let audioPlayerViewModel = AudioPlayerViewModel(audioService: AVFAudioService(), readLaterRepo: readLaterRepo)
+    let audioPlayerViewModel = AudioPlayerViewModel(
+        audioService: AVFAudioService(),
+        readLaterRepo: readLaterRepo)
     
     return NavigationStack {
         ArticlesView(summary: summary, user: user, audioViewModel: audioPlayerViewModel, isLatest: true)

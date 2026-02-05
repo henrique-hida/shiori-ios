@@ -1,5 +1,5 @@
 //
-//  ReadingHistoryRepository.swift
+//  ReadingHistoryService.swift
 //  Shiori
 //
 //  Created by Henrique Hida on 11/01/26.

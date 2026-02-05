@@ -8,18 +8,14 @@
 import Foundation
 import UserNotifications
 
-protocol NewsSyncServiceProtocol {
-    func syncAndLoadWeek(for user: UserProfile, isBackgroundTask: Bool) async throws -> [Summary]
-}
-
 @MainActor
-final class NewsSyncService: NewsSyncServiceProtocol {
-    private let localRepo: LocalNewsRepositoryProtocol
-    private let cloudRepo: CloudNewsRepositoryProtocol
+final class NewsSyncRepository: NewsSyncRepositoryProtocol {
+    private let localNewsService: LocalNewsSourceProtocol
+    private let networkNewsService: NetworkNewsSourceProtocol
     
-    init(localRepo: LocalNewsRepositoryProtocol, cloudRepo: CloudNewsRepositoryProtocol) {
-        self.localRepo = localRepo
-        self.cloudRepo = cloudRepo
+    init(localNewsService: LocalNewsSourceProtocol, networkNewsService: NetworkNewsSourceProtocol) {
+        self.localNewsService = localNewsService
+        self.networkNewsService = networkNewsService
     }
 
     func syncAndLoadWeek(for user: UserProfile, isBackgroundTask: Bool = false) async throws -> [Summary] {
@@ -30,7 +26,7 @@ final class NewsSyncService: NewsSyncServiceProtocol {
             calendar.date(byAdding: .day, value: -i, to: today)
         }
         
-        let existingNews = try localRepo.fetchWeekNews()
+        let existingNews = try localNewsService.fetchWeekNews()
         let existingDateKeys = Set(existingNews.map { formatDateKey($0.createdAt) })
         let missingDates = last7Days.filter { date in
             let key = formatDateKey(date)
@@ -46,8 +42,8 @@ final class NewsSyncService: NewsSyncServiceProtocol {
                 for date in missingDates {
                     group.addTask {
                         do {
-                            let summary = try await self.cloudRepo.getNews(for: date, preferences: user.newsPreferences)
-                            try await self.localRepo.saveNews(summary)
+                            let summary = try await self.networkNewsService.getNews(for: date, preferences: user.newsPreferences)
+                            try await self.localNewsService.saveNews(summary)
                             print("✅ Backfilled news for: \(await self.formatDateKey(date))")
                         } catch {
                             print("⚠️ Failed to fetch for \(await self.formatDateKey(date)): \(error.localizedDescription)")
@@ -64,7 +60,7 @@ final class NewsSyncService: NewsSyncServiceProtocol {
             }
         }
         
-        return try localRepo.fetchWeekNews()
+        return try localNewsService.fetchWeekNews()
     }
     
     private func formatDateKey(_ date: Date) -> String {

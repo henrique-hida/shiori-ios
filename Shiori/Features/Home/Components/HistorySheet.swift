@@ -297,19 +297,19 @@ private struct LinkNewsListView: View {
     preview.addExamples(SubjectStatsData.sampleStats)
     
     let context = preview.container.mainContext
-    let syncService = NewsSyncService(
-        localRepo: LocalNewsRepository(context: context),
-        cloudRepo: MockNewsDatabaseRepository()
+    let syncRepo = NewsSyncRepository(
+        localNewsService: LocalNewsSource(context: context),
+        networkNewsService: MockNetworkNewsSource()
     )
     
     let viewModel = HomeViewModel(
-        syncService: syncService,
-        linkSummaryRepo: GeminiLinkSummaryRepository(apiKey: ""),
-        cloudLinkPersistence: MockLinkSummaryRepository(),
-        cloudNewsRepo: MockNewsDatabaseRepository(),
-        historyRepo: ReadingHistoryRepository(modelContext: context),
+        syncRepo: syncRepo,
+        linkSummaryService: GeminiLinkSummaryService(apiKey: ""),
+        linkSummarySource: MockLinkSummarySource(),
+        networkNewsService: MockNetworkNewsSource(),
+        readingHistoryRepo: ReadingHistoryRepository(modelContext: context),
         readLaterRepo: ReadLaterRepository(modelContext: context),
-        statsRepo: SubjectStatsRepository(modelContext: context)
+        subjectStatsRepo: SubjectStatsRepository(modelContext: context)
     )
     
     let sampleSummaries = Summary.sampleSummaries.map {$0.summaryRaw}

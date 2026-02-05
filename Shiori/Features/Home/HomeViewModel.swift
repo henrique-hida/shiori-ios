@@ -34,30 +34,30 @@ final class HomeViewModel {
     var cloudHistorySummaries: [Summary] = []
     var linkNewsSummaries: [Summary] = []
     
-    private let syncService: NewsSyncServiceProtocol
-    private let linkSummaryRepo: LinkSummaryRepositoryProtocol
-    private let cloudLinkPersistence: LinkSummaryPersistenceProtocol
-    private let cloudNewsRepo: CloudNewsRepositoryProtocol
-    private let historyRepo: ReadingHistoryRepositoryProtocol
+    private let syncRepo: NewsSyncRepositoryProtocol
+    private let linkSummaryService: LinkSummaryServiceProtocol
+    private let linkSummarySource: LinkSummarySourceProtocol
+    private let networkNewsService: NetworkNewsSourceProtocol
+    private let readingHistoryRepo: ReadingHistoryRepositoryProtocol
     private let readLaterRepo: ReadLaterRepositoryProtocol
-    private let statsRepo: SubjectStatsRepositoryProtocol
+    private let subjectStatsRepo: SubjectStatsRepositoryProtocol
     
     init(
-        syncService: NewsSyncServiceProtocol,
-        linkSummaryRepo: LinkSummaryRepositoryProtocol,
-        cloudLinkPersistence: LinkSummaryPersistenceProtocol,
-        cloudNewsRepo: CloudNewsRepositoryProtocol,
-        historyRepo: ReadingHistoryRepositoryProtocol,
+        syncRepo: NewsSyncRepositoryProtocol,
+        linkSummaryService: LinkSummaryServiceProtocol,
+        linkSummarySource: LinkSummarySourceProtocol,
+        networkNewsService: NetworkNewsSourceProtocol,
+        readingHistoryRepo: ReadingHistoryRepositoryProtocol,
         readLaterRepo: ReadLaterRepositoryProtocol,
-        statsRepo: SubjectStatsRepositoryProtocol,
+        subjectStatsRepo: SubjectStatsRepositoryProtocol,
     ){
-        self.syncService = syncService
-        self.linkSummaryRepo = linkSummaryRepo
-        self.cloudLinkPersistence = cloudLinkPersistence
-        self.cloudNewsRepo = cloudNewsRepo
-        self.historyRepo = historyRepo
+        self.syncRepo = syncRepo
+        self.linkSummaryService = linkSummaryService
+        self.linkSummarySource = linkSummarySource
+        self.networkNewsService = networkNewsService
+        self.readingHistoryRepo = readingHistoryRepo
         self.readLaterRepo = readLaterRepo
-        self.statsRepo = statsRepo
+        self.subjectStatsRepo = subjectStatsRepo
         self.generateCurrentWeek()
     }
     
@@ -78,7 +78,7 @@ final class HomeViewModel {
         errorMessage = nil
         
         do {
-            let weekNews = try await syncService.syncAndLoadWeek(for: user, isBackgroundTask: false)
+            let weekNews = try await syncRepo.syncAndLoadWeek(for: user, isBackgroundTask: false)
             self.weekNewsSummaries = weekNews
             
             if weekNews.isEmpty {
@@ -98,9 +98,9 @@ final class HomeViewModel {
         errorMessage = nil
         
         do {
-            let summary = try await linkSummaryRepo.summarizeLink(url: url, style: linkSummaryStyle, duration: linkSummaryDuration)
+            let summary = try await linkSummaryService.summarizeLink(url: url, style: linkSummaryStyle, duration: linkSummaryDuration)
             if let userId = user.id {
-                try? await cloudLinkPersistence.saveLinkSummary(summary, userId: userId)
+                try? await linkSummarySource.saveLinkSummary(summary, userId: userId)
             }
             
             self.linkNewsSummaries.insert(summary, at: 0)
@@ -120,7 +120,7 @@ final class HomeViewModel {
         guard linkNewsSummaries.isEmpty else { return }
         do {
             if let userId = user.id {
-                let links = try await cloudLinkPersistence.fetchLinkSummaries(userId: userId)
+                let links = try await linkSummarySource.fetchLinkSummaries(userId: userId)
                 self.linkNewsSummaries = links
             }
         } catch {
@@ -149,7 +149,7 @@ final class HomeViewModel {
 
     func loadStreak() async {
         do {
-            let activeDays = try await historyRepo.getHistory(for: currentWeekDates)
+            let activeDays = try await readingHistoryRepo.getHistory(for: currentWeekDates)
             var newStreakMap: [String: Bool] = [:]
             let formatter = DateFormatter()
             formatter.dateFormat = "yyyy-MM-dd"
@@ -169,8 +169,8 @@ final class HomeViewModel {
         guard let summary = selectedSummary else { return }
         
         Task {
-            try? await historyRepo.markTodayAsRead(user: user)
-            await statsRepo.increment(subjects: summary.subjects)
+            try? await readingHistoryRepo.markTodayAsRead(user: user)
+            await subjectStatsRepo.increment(subjects: summary.subjects)
             await loadStreak()
             await loadStats()
         }
@@ -213,7 +213,7 @@ final class HomeViewModel {
     
     func loadStats() async {
         let year = Calendar.current.component(.year, from: Date())
-        self.subjectStats = await statsRepo.getYearlyStats(year: year)
+        self.subjectStats = await subjectStatsRepo.getYearlyStats(year: year)
     }
     
     func loadMoreCloudHistory(user: UserProfile) async {
@@ -223,7 +223,7 @@ final class HomeViewModel {
         let lastLocalDate = weekNewsSummaries.last?.createdAt ?? Date()
         
         do {
-            let history = try await cloudNewsRepo.getPreviousNewsBatch(
+            let history = try await networkNewsService.getPreviousNewsBatch(
                 from: lastLocalDate,
                 count: 23,
                 preferences: user.newsPreferences

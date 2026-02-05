@@ -1,5 +1,5 @@
 //
-//  FirestoreNewsRepository.swift
+//  FirestoreNewsService.swift
 //  Shiori
 //
 //  Created by Henrique Hida on 22/11/25.
@@ -8,7 +8,7 @@
 import Foundation
 import FirebaseFirestore
 
-final class FirestoreNewsRepository: CloudNewsRepositoryProtocol {
+final class FirestoreNewsSource: NetworkNewsSourceProtocol {
     private let db = Firestore.firestore()
     
     func getNews(for date: Date, preferences: NewsSummaryPreferences) async throws -> Summary {

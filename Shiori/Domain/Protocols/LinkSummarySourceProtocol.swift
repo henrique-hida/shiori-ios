@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol LinkSummaryPersistenceProtocol {
+protocol LinkSummarySourceProtocol {
     func saveLinkSummary(_ summary: Summary, userId: String) async throws
     func fetchLinkSummaries(userId: String) async throws -> [Summary]
 }

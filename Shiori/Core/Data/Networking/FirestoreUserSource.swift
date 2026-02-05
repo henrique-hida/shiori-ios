@@ -1,5 +1,5 @@
 //
-//  FirestoreUserRepository.swift
+//  FirestoreUserService.swift
 //  Shiori
 //
 //  Created by Henrique Hida on 22/11/25.
@@ -8,7 +8,7 @@
 import Foundation
 import FirebaseFirestore
 
-struct FirestoreUserRepository: UserRepositoryProtocol {
+struct FirestoreUserSource: UserSourceProtocol {
     private let db = Firestore.firestore()
     
     func save(_ user: UserProfile) async throws {

@@ -12,66 +12,66 @@ import SwiftData
 final class DependencyFactory {
     static let shared = DependencyFactory()
 
-    private let authRepo: AuthRepositoryProtocol
-    private let userRepo: UserRepositoryProtocol
-    private let localNewsRepo: LocalNewsRepositoryProtocol
-    private let cloudNewsRepo: CloudNewsRepositoryProtocol
-    private let linkSummaryRepo: LinkSummaryRepositoryProtocol
-    private let cloudLinkPersistenceRepo: LinkSummaryPersistenceProtocol
-    private let historyRepo: ReadingHistoryRepositoryProtocol
+    private let authService: AuthServiceProtocol
+    private let userSource: UserSourceProtocol
+    private let localNewsSource: LocalNewsSourceProtocol
+    private let networkNewsSource: NetworkNewsSourceProtocol
+    private let linkSummaryService: LinkSummaryServiceProtocol
+    private let linkSummarySource: LinkSummarySourceProtocol
+    private let readingHistoryRepo: ReadingHistoryRepositoryProtocol
     private let readLaterRepo: ReadLaterRepositoryProtocol
-    private let statsRepo: SubjectStatsRepositoryProtocol
+    private let subjectStatsRepo: SubjectStatsRepositoryProtocol
     private let audioService: AudioServiceProtocol
     
     private init() {
         let dbContext = DatabaseProvider.shared.container.mainContext
         
-        self.authRepo = FirebaseAuthRepository()
-        self.userRepo = FirestoreUserRepository()
-        self.localNewsRepo = LocalNewsRepository(context: dbContext)
-        self.cloudNewsRepo = FirestoreNewsRepository()
-        self.linkSummaryRepo = GeminiLinkSummaryRepository(apiKey: Bundle.main.geminiApiKey)
-        self.cloudLinkPersistenceRepo = FirestoreLinkSummaryRepository()
-        self.historyRepo = ReadingHistoryRepository(modelContext: dbContext)
+        self.authService = FirebaseAuthService()
+        self.userSource = FirestoreUserSource()
+        self.localNewsSource = LocalNewsSource(context: dbContext)
+        self.networkNewsSource = FirestoreNewsSource()
+        self.linkSummaryService = GeminiLinkSummaryService(apiKey: Bundle.main.geminiApiKey)
+        self.linkSummarySource = FirestoreLinkSummarySource()
+        self.readingHistoryRepo = ReadingHistoryRepository(modelContext: dbContext)
         self.readLaterRepo = ReadLaterRepository(modelContext: dbContext)
-        self.statsRepo = SubjectStatsRepository(modelContext: dbContext)
+        self.subjectStatsRepo = SubjectStatsRepository(modelContext: dbContext)
         self.audioService = AVFAudioService() // UnrealAudioService(apiKey: Bundle.main.unrealApiKey)
     }
     
     func makeSessionManager() -> SessionManager {
         return SessionManager(
-            authRepo: authRepo,
-            userRepo: userRepo
+            authService: authService,
+            userSource: userSource
         )
     }
     
     func makeSignInViewModel() -> SignInViewModel {
-        return SignInViewModel(authRepo: authRepo)
+        return SignInViewModel(authService: authService)
     }
     
     func makeSignUpViewModel() -> SignUpViewModel {
         return SignUpViewModel(
-            authRepo: authRepo,
-            userRepo: userRepo
+            authService: authService,
+            userSource: userSource
         )
     }
     
     func makeHomeViewModel() -> HomeViewModel {
         HomeViewModel(
-            syncService: makeNewsSyncService(),
-            linkSummaryRepo: linkSummaryRepo,
-            cloudLinkPersistence: cloudLinkPersistenceRepo,
-            cloudNewsRepo: cloudNewsRepo,
-            historyRepo: historyRepo,
+            syncRepo: makeNewsSyncRepository(),
+            linkSummaryService: linkSummaryService,
+            linkSummarySource: linkSummarySource,
+            networkNewsService: networkNewsSource,
+            readingHistoryRepo: readingHistoryRepo,
             readLaterRepo: readLaterRepo,
-            statsRepo: statsRepo
+            subjectStatsRepo: subjectStatsRepo
         )
     }
     
     func makeSettingsViewModel(user: UserProfile, sessionManager: SessionManager) -> SettingsViewModel {
         return SettingsViewModel(
             user: user,
-            repository: userRepo,
+            userSource: userSource,
             sessionManager: sessionManager
         )
     }
@@ -83,10 +83,10 @@ final class DependencyFactory {
         )
     }
     
-    func makeNewsSyncService() -> NewsSyncService {
-        NewsSyncService(
-            localRepo: localNewsRepo,
-            cloudRepo: cloudNewsRepo
+    func makeNewsSyncRepository() -> NewsSyncRepository {
+        NewsSyncRepository(
+            localNewsService: localNewsSource,
+            networkNewsService: networkNewsSource
         )
     }
 }

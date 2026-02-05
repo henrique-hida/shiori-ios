@@ -157,7 +157,14 @@ private struct SourcesSheet: View {
     preview.addExamples(ReadLaterData.sampleReadLater)
     
     let readLaterRepo = ReadLaterRepository(modelContext: preview.container.mainContext)
-    let audioPlayerViewModel = AudioPlayerViewModel(audioService: AVFAudioService(), readLaterRepo: readLaterRepo)
+    let audioPlayerViewModel = AudioPlayerViewModel(
+        audioService: AVFAudioService(),
+        readLaterRepo: readLaterRepo
+    )
     
-    return AudioPlayerView(vm: audioPlayerViewModel, summary: Summary.sampleSummaries[0].summaryRaw, user: UserProfile.sampleUser)
+    return AudioPlayerView(
+        vm: audioPlayerViewModel,
+        summary: Summary.sampleSummaries[0].summaryRaw,
+        user: UserProfile.sampleUser
+    )
 }

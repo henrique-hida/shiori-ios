@@ -1,5 +1,5 @@
 //
-//  GeminiLinkSummaryRepository.swift
+//  GeminiLinkSummaryService.swift
 //  Shiori
 //
 //  Created by Henrique Hida on 11/01/26.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class GeminiLinkSummaryRepository: LinkSummaryRepositoryProtocol {
+final class GeminiLinkSummaryService: LinkSummaryServiceProtocol {
     private let apiKey: String
     private let modelName: String = "gemini-2.5-flash"
     

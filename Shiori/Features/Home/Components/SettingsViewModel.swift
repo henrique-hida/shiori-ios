@@ -23,12 +23,12 @@ final class SettingsViewModel {
     var isLoading: Bool = false
     
     private var user: UserProfile
-    private let repository: UserRepositoryProtocol
+    private let userSource: UserSourceProtocol
     private let sessionManager: SessionManager
         
-    init(user: UserProfile, repository: UserRepositoryProtocol, sessionManager: SessionManager) {
+    init(user: UserProfile, userSource: UserSourceProtocol, sessionManager: SessionManager) {
         self.user = user
-        self.repository = repository
+        self.userSource = userSource
         self.sessionManager = sessionManager
         
         self.selectedStyle = user.newsPreferences.style
@@ -52,7 +52,7 @@ final class SettingsViewModel {
         user.theme = isDarkMode ? .dark : .light
         
         do {
-            try await repository.save(user)
+            try await userSource.save(user)
             onSuccess()
         } catch {
             print("❌ Erro ao salvar: \(error)")
@@ -61,12 +61,10 @@ final class SettingsViewModel {
         isLoading = false
     }
     
-    // MARK: - Helpers de Formatação (Para ficar igual à imagem)
-    
     var hoursOptions: [Int] { Array(0...23) }
     func formatHour(_ hour: Int) -> String { "\(hour)h" }
     
     func translateStyle(_ style: SummaryStyle) -> String {
-        return style.rawValue.capitalized // "Informal", etc.
+        return style.rawValue.capitalized
     }
 }

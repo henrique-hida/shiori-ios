@@ -18,11 +18,11 @@ final class SignInViewModel {
     var emailErrorMessage: String? = nil
     var passwordErrorMessage: String? = nil
     
-    private let authRepo: AuthRepositoryProtocol
+    private let authService: AuthServiceProtocol
     private let validator: CredentialsValidator = CredentialsValidator()
     
-    init(authRepo: AuthRepositoryProtocol) {
-        self.authRepo = authRepo
+    init(authService: AuthServiceProtocol) {
+        self.authService = authService
     }
     
     func login() async {
@@ -30,7 +30,7 @@ final class SignInViewModel {
         do {
             try validator.isValidEmail(email)
             try validator.isValidPassword(password)
-            try await authRepo.signIn(email, password)
+            try await authService.signIn(email, password)
         } catch let error as ValidationError {
             applyErrorToField(error)
         } catch let error as AuthError {

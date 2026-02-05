@@ -1,5 +1,5 @@
 //
-//  FirestoreLinkSummaryRepository.swift
+//  FirestoreLinkSummaryService.swift
 //  Shiori
 //
 //  Created by Henrique Hida on 03/02/26.
@@ -8,7 +8,7 @@
 import Foundation
 import FirebaseFirestore
 
-final class FirestoreLinkSummaryRepository: LinkSummaryPersistenceProtocol {
+final class FirestoreLinkSummarySource: LinkSummarySourceProtocol {
     private let db = Firestore.firestore()
     
     func saveLinkSummary(_ summary: Summary, userId: String) async throws {

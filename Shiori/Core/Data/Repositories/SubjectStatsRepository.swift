@@ -1,5 +1,5 @@
 //
-//  SubjectStatsRepository.swift
+//  SubjectStatsService.swift
 //  Shiori
 //
 //  Created by Henrique Hida on 12/01/26.

@@ -8,7 +8,7 @@
 import Foundation
 @testable import Shiori
 
-struct MockGeminiRepository: LinkSummaryRepositoryProtocol {
+struct MockGeminiService: LinkSummaryServiceProtocol {
     func summarizeLink(url: URL, style: Shiori.SummaryStyle, duration: Shiori.SummaryDuration) async throws -> Shiori.Summary {
         return Summary(
             id: "preview-news-1",

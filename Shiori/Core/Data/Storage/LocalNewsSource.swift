@@ -1,5 +1,5 @@
 //
-//  LocalNewsRepository.swift
+//  LocalNewsService.swift
 //  Shiori
 //
 //  Created by Henrique Hida on 22/11/25.
@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @MainActor
-final class LocalNewsRepository: LocalNewsRepositoryProtocol {
+final class LocalNewsSource: LocalNewsSourceProtocol {
     private let context: ModelContext
     
     init(context: ModelContext) {
